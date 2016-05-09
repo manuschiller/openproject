@@ -59,6 +59,11 @@ function DetailsTabOverviewController(
                                                     group,
                                                     vm.workPackage);
   };
+
+  vm.shouldHideField = function(field) {
+    return WorkPackagesDisplayHelper.shouldHideField(vm.workPackage, field, vm.hideEmptyFields);
+  };
+
   vm.isFieldHideable = WorkPackagesDisplayHelper.isFieldHideable;
   vm.getLabel = WorkPackagesDisplayHelper.getLabel;
   vm.isSpecified = WorkPackagesDisplayHelper.isSpecified;

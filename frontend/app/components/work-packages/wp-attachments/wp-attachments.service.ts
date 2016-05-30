@@ -64,14 +64,22 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
       return allUploadsDone.promise;
     },
 
-    load = function (workPackage, reload:boolean = false) {
-      var path = workPackage.$links.attachments.$link.href,
-        attachments = $q.defer();
-      $http.get(path, {cache: !reload}).success(function (response) {
-        attachments.resolve(response._embedded.elements);
-      }).error(function (err) {
-        attachments.reject(err);
-      });
+    load = (workPackage, reload:boolean = false) => {
+      const attachments = $q.defer();
+
+      if (workPackage.$links.attachments) {
+        var path = workPackage.$links.attachments.$link.href;
+
+        $http.get(path, {cache: !reload}).success(response => {
+          attachments.resolve(response._embedded.elements);
+        }).error(err => {
+          attachments.reject(err);
+        });
+      }
+      else {
+        attachments.reject(null);
+      }
+
       return attachments.promise;
     },
 

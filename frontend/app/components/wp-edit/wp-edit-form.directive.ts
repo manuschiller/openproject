@@ -143,7 +143,7 @@ export class WorkPackageEditFormController {
     this.workPackage.save()
       .then(() => {
         angular.forEach(this.fields, field => field.setErrorState(false));
-        deferred.resolve();
+        deferred.resolve(this.workPackage);
 
         this.showSaveNotification();
         this.successHandler({workPackage: this.workPackage, fields: this.fields});

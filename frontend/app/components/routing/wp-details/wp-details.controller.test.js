@@ -26,8 +26,6 @@
 // See doc/COPYRIGHT.rdoc for more details.
 // ++
 
-/*jshint expr: true*/
-
 describe('WorkPackageDetailsController', function() {
   var scope;
   var promise;
@@ -111,7 +109,7 @@ describe('WorkPackageDetailsController', function() {
       };
 
   beforeEach(angular.mock.module('openproject.api', 'openproject.layout', 'openproject.services',
-    'openproject.workPackages.controllers', 'openproject.services'));
+    'openproject.workPackages.controllers', 'openproject.services', 'openproject'));
 
   beforeEach(angular.mock.module('openproject.templates', function($provide) {
     var configurationService = {};

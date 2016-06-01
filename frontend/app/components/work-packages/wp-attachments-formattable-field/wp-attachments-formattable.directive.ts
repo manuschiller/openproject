@@ -86,7 +86,9 @@ export class WpAttachmentsFormattableController {
               else{
                   _.each(dropData.files,(file)=>{
                     description.insertAttachmentLink(file.name.replace(/ /g , "_"), InsertMode.ATTACHMENT,true);
+                    // TODO: solve via service
                     this.wpAttachments.pendingAttachments.push(file);
+                    this.$rootScope.$broadcast("addPendingAttachments",file)
                   });
                   description.save();
                 }

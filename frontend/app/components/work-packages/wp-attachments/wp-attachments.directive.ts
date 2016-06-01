@@ -113,13 +113,10 @@ function wpAttachmentsDirective(wpAttachments,
       upload(event,wp);
     });
 
-    scope.$on('addPendingAttachments',(evt,files)=>{
+    scope.$on('addPendingAttachments',(evt,file)=>{
       scope.attachments = scope.attachments || [];
-      _.each(files,(file)=>{
         scope.files.push(file);
         scope.attachments.push(file);
-      });
-      console.log(scope.files);
     });
 
     scope.filterFiles = function (files) {

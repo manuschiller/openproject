@@ -41,11 +41,23 @@ function wpAttachmentsDirective(wpAttachments,
     scope.files = [];
     scope.element = element;
 
+
+
     var workPackage = scope.workPackage(),
       upload = function (event, workPackage) {
-        if (angular.isUndefined(scope.files)) {
+        if (angular.isUndefined(scope.files)) return;
+
+        if(workPackage.isNew){
+          scope.attachments = [];
+
+          _.each(scope.files,(file)=>{
+            scope.attachments.push(file);
+          });
+
+          console.log(scope.attachments);
           return;
         }
+
         if (scope.files.length > 0) {
           wpAttachments.upload(workPackage, scope.files).then(function () {
             scope.files = [];
@@ -64,6 +76,7 @@ function wpAttachmentsDirective(wpAttachments,
           scope.loading = false;
         });
       };
+
 
     scope.I18n = I18n;
     scope.rejectedFiles = [];
@@ -96,11 +109,22 @@ function wpAttachmentsDirective(wpAttachments,
       return currentlyFocusing === attachment;
     };
 
-    scope.$on('uploadPendingAttachments', upload);
+    scope.$on('uploadPendingAttachments', (event,wp)=>{
+      upload(event,wp);
+    });
+
+    scope.$on('addPendingAttachments',(evt,files)=>{
+      scope.attachments = scope.attachments || [];
+      _.each(files,(file)=>{
+        scope.files.push(file);
+        scope.attachments.push(file);
+      });
+      console.log(scope.files);
+    });
 
     scope.filterFiles = function (files) {
       // Directories cannot be uploaded and as such, should not become files in
-      // the sense of this directive.  The files within the direcotories will
+      // the sense of this directive.  The files within the directories will
       // be taken though.
       _.remove(files, (file:any) => {
         return file.type === 'directory';
@@ -126,6 +150,17 @@ function wpAttachmentsDirective(wpAttachments,
       NotificationsService.addError(message, errors);
     });
 
+    if(scope.workPackage.isNew){
+      scope.$watch('files',(files)=>{
+        if(files.length > 0)
+        //wpAttachments.pendingAttachments = [];
+        _.each(files,(file)=>{
+          wpAttachments.pendingAttachments.push(file)
+        });
+        console.log("att",wpAttachments);
+      })
+    }
+
     scope.fetchingConfiguration = true;
     ConfigurationService.api().then(function (settings) {
       scope.maximumFileSize = settings.maximumAttachmentFileSize;
@@ -144,11 +179,9 @@ function wpAttachmentsDirective(wpAttachments,
       workPackage: '&'
     },
     templateUrl: (element, attrs) => {
-      if (editMode(attrs)) {
-        return '/components/work-packages/wp-attachments/wp-attachments-edit.directive.html';
-      }
-
-      return '/components/work-packages/wp-attachments/wp-attachments.directive.html';
+        return editMode(attrs)
+          ? '/components/work-packages/wp-attachments/wp-attachments-edit.directive.html'
+          : '/components/work-packages/wp-attachments/wp-attachments.directive.html';
     },
 
     link: WorkPackageAttachmentsController

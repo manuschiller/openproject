@@ -86,6 +86,9 @@ export class WorkPackageCreateController {
     this.wpCreate.saveWorkPackage().then(wp => {
       if(this.wpAttachments.pendingAttachments.length > 0){
         this.wpAttachments.uploadPendingAttachments(wp).then(()=>{
+          //TODO: add callback support for wpAttachments directive
+          //to get rid of the $broadcasts..
+          this.$rootScope.$broadcast("reloadWpAttachments");
           this.proceedToWp(successState,wp);
         });
       }else{

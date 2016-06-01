@@ -150,6 +150,7 @@ function wpAttachmentsDirective(wpAttachments,
       NotificationsService.addError(message, errors);
     });
 
+    // TODO: make this to work with wpAttachments.uploadQueue[]
     if(scope.workPackage.isNew){
       scope.$watch('files',(files)=>{
         if(files.length > 0)
@@ -157,7 +158,6 @@ function wpAttachmentsDirective(wpAttachments,
         _.each(files,(file)=>{
           wpAttachments.pendingAttachments.push(file)
         });
-        console.log("att",wpAttachments);
       })
     }
 
@@ -167,6 +167,10 @@ function wpAttachmentsDirective(wpAttachments,
       // somehow, I18n cannot interpolate function results, so we need to cache this once
       scope.maxFileSize = scope.size(settings.maximumAttachmentFileSize);
       scope.fetchingConfiguration = false;
+    });
+
+    scope.$on('reloadWpAttachments', function(){
+      loadAttachments();
     });
 
     loadAttachments();

@@ -3,7 +3,7 @@
  */
 
 import {IApplyAttachmentMarkup} from './interfaces'
-import {InsertMode} from './enums'
+import {InsertMode} from './wp-attachments-formattable.enums'
 
 export class EditorModel implements IApplyAttachmentMarkup{
     private currentCaretPosition: number;

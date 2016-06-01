@@ -53,6 +53,7 @@ export class WorkPackageCreateController {
               protected NotificationsService,
               protected loadingIndicator,
               protected wpCreate:WorkPackageCreateService,
+              protected wpAttachments,
               protected wpCacheService:WorkPackageCacheService) {
     scopedObservable($scope, wpCreate.createNewWorkPackage($state.params.projectPath))
       .subscribe(wp => {
@@ -73,13 +74,24 @@ export class WorkPackageCreateController {
     this.$state.go('work-packages.list', this.$state.params);
   }
 
+  protected proceedToWp = (successState:string,wp: any) => {
+    this.loadingIndicator.mainPage = this.$state.go(successState, {workPackageId: wp.id})
+      .then(() => {
+        this.$rootScope.$emit('workPackagesRefreshInBackground');
+        this.notifySuccess();
+      });
+  }
+
   public saveWorkPackage(successState:string) {
     this.wpCreate.saveWorkPackage().then(wp => {
-      this.loadingIndicator.mainPage = this.$state.go(successState, {workPackageId: wp.id})
-        .then(() => {
-          this.$rootScope.$emit('workPackagesRefreshInBackground');
-          this.notifySuccess();
+      if(this.wpAttachments.pendingAttachments.length > 0){
+        this.wpAttachments.uploadPendingAttachments(wp).then(()=>{
+          this.proceedToWp(successState,wp);
         });
+      }else{
+       this.proceedToWp(successState,wp);
+      }
+
     });
   }
 

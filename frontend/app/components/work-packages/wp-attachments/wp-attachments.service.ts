@@ -27,41 +27,46 @@
 // ++
 
 import {wpServicesModule} from '../../../angular-modules.ts';
+import ArrayLiteralExpression = ts.ArrayLiteralExpression;
 
 function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsService) {
   var upload = (workPackage, files) => {
-      var uploadPath = workPackage.$links.addAttachment.$link.href;
-      var uploads = _.map(files, (file:any) => {
-        var options = {
-          url: uploadPath,
-          fields: {
-            metadata: {
-              fileName: file.name,
-              description: file.description
-            }
-          },
-          file: file
-        };
-        return Upload.upload(options);
-      });
 
-      // notify the user
-      var message = I18n.t('js.label_upload_notification', {
-        id: workPackage.id,
-        subject: workPackage.subject
-      });
+      if (angular.isDefined(workPackage.$links.attachments)){
+        var uploadPath = workPackage.$links.addAttachment.$link.href;
+        var uploads = _.map(files, (file:any) => {
+          var options = {
+            url: uploadPath,
+            fields: {
+              metadata: {
+                fileName: file.name,
+                description: file.description
+              }
+            },
+            file: file
+          };
+          return Upload.upload(options);
+        });
 
-      var notification = NotificationsService.addWorkPackageUpload(message, uploads);
-      var allUploadsDone = $q.defer();
-      $q.all(uploads).then(function () {
-        $timeout(function () { // let the notification linger for a bit
-          NotificationsService.remove(notification);
-          allUploadsDone.resolve();
-        }, 700);
-      }, function (err) {
-        allUploadsDone.reject(err);
-      });
-      return allUploadsDone.promise;
+        // notify the user
+        var message = I18n.t('js.label_upload_notification', {
+          id: workPackage.id,
+          subject: workPackage.subject
+        });
+
+        var notification = NotificationsService.addWorkPackageUpload(message, uploads);
+        var allUploadsDone = $q.defer();
+        $q.all(uploads).then(function () {
+          $timeout(function () { // let the notification linger for a bit
+            NotificationsService.remove(notification);
+            allUploadsDone.resolve();
+          }, 700);
+        }, function (err) {
+          allUploadsDone.reject(err);
+        });
+        return allUploadsDone.promise;
+      }
+
     },
 
     load = (workPackage, reload:boolean = false) => {
@@ -71,6 +76,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         var path = workPackage.$links.attachments.$link.href;
 
         $http.get(path, {cache: !reload}).success(response => {
+          currentAttachments = response._embedded.elements;
           attachments.resolve(response._embedded.elements);
         }).error(err => {
           attachments.reject(err);
@@ -104,13 +110,26 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         existance.resolve(attachments.length > 0);
       });
       return existance.promise;
+    },
+
+    pendingAttachments = [],
+
+    currentAttachments = [],
+
+    uploadPendingAttachments = function(wp){
+      if(angular.isDefined(wp) && pendingAttachments.length > 0)
+        return upload(wp,pendingAttachments);
     };
+
 
   return {
     upload: upload,
     remove: remove,
     load: load,
-    hasAttachments: hasAttachments
+    hasAttachments: hasAttachments,
+    currentAttachments: currentAttachments,
+    pendingAttachments: pendingAttachments,
+    uploadPendingAttachments: uploadPendingAttachments
   };
 }
 

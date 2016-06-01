@@ -18,11 +18,11 @@
               <span class="inplace-edit--read-value">
                 <i class="icon-attachment"></i>
                 <a class="work-package--attachments--filename"
-                   data-ng-href="{{attachment._links.downloadLocation.href}}"
+                   data-ng-href="{{attachment._links.downloadLocation.href || '#'}}"
                    download
                    data-ng-focus="focus(attachment)"
                    data-ng-blur="focus(null)">
-                  {{::attachment.fileName}}
+                  {{::attachment.name || attachment.fileName}}
                 </a>
               </span>
               <a href=''

@@ -112,7 +112,6 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
     },
 
     pendingAttachments = [],
-
     currentAttachments = [],
 
     uploadPendingAttachments = function(wp){

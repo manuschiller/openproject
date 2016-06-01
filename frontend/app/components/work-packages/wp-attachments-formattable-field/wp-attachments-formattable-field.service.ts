@@ -27,7 +27,7 @@
 // ++
 
 import {openprojectModule} from "../../../angular-modules";
-import {DropModel,EditorModel,MarkupModel,SingleAttachmentModel} from './models'
+import {DropModel,EditorModel,MarkupModel,SingleAttachmentModel} from './wp-attachments-formattable.models'
 
 export class WpAttachmentsFormattableService{
 

@@ -56,7 +56,6 @@ export class WpAttachmentsFormattableController {
             if(dropData.filesAreValidForUploading()){
                 if(!dropData.isDelayedUpload){
                     this.wpAttachments.upload(workPackage,dropData.files).then((upload) => {
-                            this.$rootScope.$broadcast("reloadWpAttachmentsDirective");
                             this.wpAttachments.load(workPackage,true).then((updatedAttachments) => {
                                 if(angular.isUndefined(updatedAttachments))
                                     return;
@@ -77,6 +76,7 @@ export class WpAttachmentsFormattableController {
                                 }
 
                                 description.save();
+                                this.$rootScope.$broadcast("reloadWpAttachments");
 
                             })
                     },function(err){
@@ -87,7 +87,9 @@ export class WpAttachmentsFormattableController {
                   _.each(dropData.files,(file)=>{
                     description.insertAttachmentLink(file.name.replace(/ /g , "_"), InsertMode.ATTACHMENT,true);
                     // TODO: solve via service
-                    this.wpAttachments.pendingAttachments.push(file);
+                    file['isPending'] = true;
+                    console.log(file)
+                    this.wpAttachments.addPendingAttachments(file);
                     this.$rootScope.$broadcast("addPendingAttachments",file)
                   });
                   description.save();

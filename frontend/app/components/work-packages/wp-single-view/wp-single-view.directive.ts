@@ -125,12 +125,6 @@ export class WorkPackageSingleViewController {
         return left.localeCompare(right);
       });
     });
-
-    if (this.workPackage.attachments) {
-      this.wpAttachments.hasAttachments(this.workPackage).then(bool => {
-        this.filesExist = bool;
-      });
-    }
   }
 }
 

@@ -41,7 +41,8 @@ export class WorkPackageCreateService {
   constructor(protected $q:IQService,
               protected WorkPackageResource:typeof WorkPackageResource,
               protected wpEditModeState:WorkPackageEditModeStateService,
-              protected apiWorkPackages:ApiWorkPackagesService) {
+              protected apiWorkPackages:ApiWorkPackagesService,
+              protected wpAttachments) {
   }
 
   public createNewWorkPackage(projectIdentifier) {
@@ -62,8 +63,24 @@ export class WorkPackageCreateService {
       if (this.wpEditModeState.active) {
         this.wpEditModeState.save().then(wp => {
           this._newWorkPackage = null;
-          
-          deferred.resolve(wp);
+          let currentAttachments = this.wpAttachments.getCurrentAttachments();
+          if(currentAttachments.length > 0){
+            let pendingAttachments = [];
+
+            _.each(currentAttachments,(file)=>{
+              if(file.isPending) pendingAttachments.push(file);
+            });
+
+            if(pendingAttachments.length > 0){
+              this.wpAttachments.uploadPendingAttachments(wp).then(()=>{
+                deferred.resolve(wp);
+              })
+            }
+          }
+          else{
+            deferred.resolve(wp);
+          }
+
         });
       }
       else {

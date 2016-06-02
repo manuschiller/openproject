@@ -76,7 +76,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         var path = workPackage.$links.attachments.$link.href;
 
         $http.get(path, {cache: !reload}).success(response => {
-          currentAttachments = response._embedded.elements;
+          _attachments = response._embedded.elements;
           attachments.resolve(response._embedded.elements);
         }).error(err => {
           attachments.reject(err);
@@ -94,6 +94,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
       if (angular.isObject(fileOrAttachment._links)) {
         var path = fileOrAttachment._links.self.href;
         $http.delete(path).success(function () {
+          _.remove(_attachments,fileOrAttachment);
           removal.resolve(fileOrAttachment);
         }).error(function (err) {
           removal.reject(err);
@@ -106,18 +107,32 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
 
     hasAttachments = function (workPackage) {
       var existance = $q.defer();
+
       load(workPackage).then(function (attachments:any) {
         existance.resolve(attachments.length > 0);
       });
       return existance.promise;
     },
 
-    pendingAttachments = [],
-    currentAttachments = [],
+    getCurrentAttachments = function(){
+      return _attachments;
+    },
+
+    addPendingAttachments = function(files){
+      if(typeof files === "array"){
+        _.each(files,function(file){
+          _attachments.push(file);
+        });
+      }else{
+        _attachments.push(files);
+      }
+    },
+
+    _attachments = [],
 
     uploadPendingAttachments = function(wp){
-      if(angular.isDefined(wp) && pendingAttachments.length > 0)
-        return upload(wp,pendingAttachments);
+      if(angular.isDefined(wp) && _attachments.length > 0)
+        return upload(wp,_attachments);
     };
 
 
@@ -125,9 +140,10 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
     upload: upload,
     remove: remove,
     load: load,
+    attachments: _attachments,
     hasAttachments: hasAttachments,
-    currentAttachments: currentAttachments,
-    pendingAttachments: pendingAttachments,
+    addPendingAttachments: addPendingAttachments,
+    getCurrentAttachments: getCurrentAttachments,
     uploadPendingAttachments: uploadPendingAttachments
   };
 }

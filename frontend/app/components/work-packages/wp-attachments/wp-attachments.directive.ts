@@ -38,10 +38,11 @@ function wpAttachmentsDirective(wpAttachments,
   };
 
   function WorkPackageAttachmentsController(scope, element, attrs,controllers) {
-    scope.files = [];
-    scope.element = element;
-
     scope.attachments = wpAttachments.getCurrentAttachments();
+    scope.element = element;
+    scope.files = [];
+
+    console.log(editMode(attrs) ? "edit" : "normal");
 
     var workPackage = scope.workPackage(),
       upload = function (event, workPackage) {
@@ -53,7 +54,6 @@ function wpAttachmentsDirective(wpAttachments,
             scope.attachments.push(file);
           });
 
-          console.log(editMode(attrs) ? "edit" : "normal");
           return;
         }
 
@@ -77,6 +77,7 @@ function wpAttachmentsDirective(wpAttachments,
       };
 
     scope.$watch('attachments',(attachments)=>{
+      console.log('att',attachments);
       controllers.filesExist = (attachments.length > 0);
     });
 
@@ -93,6 +94,7 @@ function wpAttachmentsDirective(wpAttachments,
         // moved logic to wpAttachments.remove()
       }).finally(function () {
         _.remove(currentlyRemoving, file);
+        _.remove(wpAttachments.attachments, file)
       });
     };
 
@@ -112,12 +114,6 @@ function wpAttachmentsDirective(wpAttachments,
 
     scope.$on('uploadPendingAttachments', (event,wp)=>{
       upload(event,wp);
-    });
-
-    scope.$on('addPendingAttachments',(evt,file)=>{
-      scope.attachments = scope.attachments || [];
-        scope.files.push(file);
-        scope.attachments.push(file);
     });
 
     scope.filterFiles = function (files) {

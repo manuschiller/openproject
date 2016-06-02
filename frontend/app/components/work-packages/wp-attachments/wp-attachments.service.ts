@@ -120,7 +120,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
 
     resetAttachmentsList = function(){
       _attachments = [];
-    }
+    },
 
     addPendingAttachments = function(files){
       if(typeof files === "array"){

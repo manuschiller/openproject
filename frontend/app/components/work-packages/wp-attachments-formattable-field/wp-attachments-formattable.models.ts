@@ -2,7 +2,7 @@
  * Created by manu on 19.05.16.
  */
 
-import {IApplyAttachmentMarkup} from './interfaces'
+import {IApplyAttachmentMarkup} from './wp-attachments-formattable.interfaces'
 import {InsertMode} from './wp-attachments-formattable.enums'
 
 export class EditorModel implements IApplyAttachmentMarkup{

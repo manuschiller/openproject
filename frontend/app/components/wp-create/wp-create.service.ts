@@ -43,6 +43,7 @@ export class WorkPackageCreateService {
               protected wpEditModeState:WorkPackageEditModeStateService,
               protected apiWorkPackages:ApiWorkPackagesService,
               protected wpAttachments) {
+    wpAttachments.resetAttachmentsList();
   }
 
   public createNewWorkPackage(projectIdentifier) {

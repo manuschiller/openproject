@@ -55,6 +55,9 @@ export class WorkPackageCreateController {
               protected wpCreate:WorkPackageCreateService,
               protected wpAttachments,
               protected wpCacheService:WorkPackageCacheService) {
+
+    wpAttachments.resetAttachmentsList();
+
     scopedObservable($scope, wpCreate.createNewWorkPackage($state.params.projectPath))
       .subscribe(wp => {
         this.newWorkPackage = wp;

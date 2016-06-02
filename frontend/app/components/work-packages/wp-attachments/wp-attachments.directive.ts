@@ -81,6 +81,10 @@ function wpAttachmentsDirective(wpAttachments,
       controllers.filesExist = (attachments.length > 0);
     });
 
+    scope.$watch('files',(attachments)=>{
+      console.log('files',attachments);
+    });
+
     scope.I18n = I18n;
     scope.rejectedFiles = [];
     scope.size = ConversionService.fileSize;

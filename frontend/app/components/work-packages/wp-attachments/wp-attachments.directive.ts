@@ -37,24 +37,23 @@ function wpAttachmentsDirective(wpAttachments,
     return !angular.isUndefined(attrs.edit);
   };
 
-  function WorkPackageAttachmentsController(scope, element, attrs) {
+  function WorkPackageAttachmentsController(scope, element, attrs,controllers) {
     scope.files = [];
     scope.element = element;
 
-
+    scope.attachments = wpAttachments.getCurrentAttachments();
 
     var workPackage = scope.workPackage(),
       upload = function (event, workPackage) {
         if (angular.isUndefined(scope.files)) return;
 
         if(workPackage.isNew){
-          scope.attachments = [];
 
           _.each(scope.files,(file)=>{
             scope.attachments.push(file);
           });
 
-          console.log(scope.attachments);
+          console.log(editMode(attrs) ? "edit" : "normal");
           return;
         }
 
@@ -71,12 +70,15 @@ function wpAttachmentsDirective(wpAttachments,
         }
         scope.loading = true;
         wpAttachments.load(workPackage, true).then(function (attachments) {
-          scope.attachments = attachments;
+          scope.attachments = wpAttachments.getCurrentAttachments();
         }).finally(function () {
           scope.loading = false;
         });
       };
 
+    scope.$watch('attachments',(attachments)=>{
+      controllers.filesExist = (attachments.length > 0);
+    });
 
     scope.I18n = I18n;
     scope.rejectedFiles = [];
@@ -85,11 +87,10 @@ function wpAttachmentsDirective(wpAttachments,
     scope.hasRightToUpload = !!(workPackage.$links.addAttachment || workPackage.isNew);
 
     var currentlyRemoving = [];
-    scope.remove = function (file) {
+    scope.remove = function(file){
       currentlyRemoving.push(file);
       wpAttachments.remove(file).then(function (file) {
-        _.remove(scope.attachments, file);
-        _.remove(scope.files, file);
+        // moved logic to wpAttachments.remove()
       }).finally(function () {
         _.remove(currentlyRemoving, file);
       });
@@ -130,7 +131,6 @@ function wpAttachmentsDirective(wpAttachments,
 
     scope.uploadFilteredFiles = function (files) {
       scope.filterFiles(files);
-
       scope.$emit('uploadPendingAttachments', workPackage);
     };
 
@@ -176,6 +176,7 @@ function wpAttachmentsDirective(wpAttachments,
   return {
     restrict: 'E',
     replace: true,
+    require: '^wpSingleView',
     scope: {
       workPackage: '&'
     },

@@ -118,6 +118,10 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
       return _attachments;
     },
 
+    resetAttachmentsList = function(){
+      _attachments = [];
+    }
+
     addPendingAttachments = function(files){
       if(typeof files === "array"){
         _.each(files,function(file){
@@ -143,6 +147,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
     attachments: _attachments,
     hasAttachments: hasAttachments,
     addPendingAttachments: addPendingAttachments,
+    resetAttachmentsList: resetAttachmentsList,
     getCurrentAttachments: getCurrentAttachments,
     uploadPendingAttachments: uploadPendingAttachments
   };

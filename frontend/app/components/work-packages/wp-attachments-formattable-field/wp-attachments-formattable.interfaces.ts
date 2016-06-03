@@ -1,4 +1,4 @@
-import {InsertMode} from './enums'
+import {InsertMode} from './wp-attachments-formattable.enums'
 
 export interface IApplyAttachmentMarkup{
     contentToInsert: string;

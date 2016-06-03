@@ -34,7 +34,7 @@ export class EditorModel implements IApplyAttachmentMarkup{
     public save = () => {
         $(this.textarea).val(this.textarea[0].value.substring(0, this.currentCaretPosition) +
             this.contentToInsert +
-            this.textarea[0].value.substring(this.currentCaretPosition, this.textarea[0].value.length)).change();
+            this.textarea[0].value.substring(this.currentCaretPosition, this.textarea[0].value.length));
     }
 }
 

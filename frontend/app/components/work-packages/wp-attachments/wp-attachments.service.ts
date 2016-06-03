@@ -95,7 +95,6 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         var path = fileOrAttachment._links.self.href;
         $http.delete(path).success(function () {
           _.remove(_attachments,fileOrAttachment);
-          console.log("getCurrentAttachments:", getCurrentAttachments());
           removal.resolve(fileOrAttachment);
         }).error(function (err) {
           removal.reject(err);

@@ -83,6 +83,15 @@ function wpAttachmentsDirective(wpAttachments,
     scope.hasRightToUpload = !!(workPackage.$links.addAttachment || workPackage.isNew);
 
     scope.remove = function(file){
+      console.log("remove");
+      if(scope.workPackage.isNew){
+        console.log("is new");
+        // uploads are pending and do not have to be removed
+        // from the backend
+        _.remove(wpAttachments.attachments,file);
+        console.log(wpAttachments.attachments);
+        return;
+      }
       wpAttachments.remove(file).finally(function () {
         console.log(wpAttachments.getCurrentAttachments());
       });

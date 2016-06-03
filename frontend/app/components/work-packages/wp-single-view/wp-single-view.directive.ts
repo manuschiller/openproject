@@ -54,11 +54,11 @@ export class WorkPackageSingleViewController {
               protected wpAttachments,
               protected SingleViewWorkPackage) {
 
+    // Ultra ugly - but couldn't bind 'this.files' or 'this.$scope.files'
+    // to wpAttachments.getCurrentAttachments().length > 1 directly
     this.$scope.$watch(()=>{return wpAttachments.getCurrentAttachments()},(attachments)=>{
-      console.log(attachments);
-      alert("new att count: " + attachments.length);
       this.filesExist = (attachments.length > 0);
-    });
+    },true);
 
     this.groupedFields = WorkPackagesOverviewService.getGroupedWorkPackageOverviewAttributes();
     this.text = {
@@ -69,6 +69,8 @@ export class WorkPackageSingleViewController {
         }
       }
     };
+
+    this.$scope.filesExist = wpAttachments.getCurrentAttachments();
 
     if ($stateParams.workPackageId) {
       scopedObservable($scope, wpCacheService.loadWorkPackage($stateParams.workPackageId)).subscribe(wp => {

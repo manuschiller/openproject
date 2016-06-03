@@ -37,7 +37,7 @@ function wpAttachmentsDirective(wpAttachments,
     return !angular.isUndefined(attrs.edit);
   };
 
-  function WorkPackageAttachmentsController(scope, element, attrs,controllers) {
+  function WorkPackageAttachmentsController(scope, element, attrs) {
     scope.attachments = wpAttachments.getCurrentAttachments();
     scope.element = element;
     scope.files = [];
@@ -76,16 +76,6 @@ function wpAttachmentsDirective(wpAttachments,
         });
       };
 
-    scope.$watch(wpAttachments.getCurrentAttachments().length,(attachments)=>{
-      console.log('att',attachments);
-      alert("filesExist changed in directive" + (attachments > 0))
-      controllers.filesExist = (attachments > 0);
-    });
-
-    scope.$watch('files',(attachments)=>{
-      console.log('files',attachments);
-    });
-
     scope.I18n = I18n;
     scope.rejectedFiles = [];
     scope.size = ConversionService.fileSize;
@@ -94,7 +84,7 @@ function wpAttachmentsDirective(wpAttachments,
 
     scope.remove = function(file){
       wpAttachments.remove(file).finally(function () {
-        console.log("removed");
+        console.log(wpAttachments.getCurrentAttachments());
       });
     };
 

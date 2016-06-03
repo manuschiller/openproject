@@ -95,6 +95,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         var path = fileOrAttachment._links.self.href;
         $http.delete(path).success(function () {
           _.remove(_attachments,fileOrAttachment);
+          console.log("getCurrentAttachments:", getCurrentAttachments());
           removal.resolve(fileOrAttachment);
         }).error(function (err) {
           removal.reject(err);
@@ -119,11 +120,11 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
     },
 
     resetAttachmentsList = function(){
-      _attachments = [];
+      _attachments.length = 0;
     },
 
     addPendingAttachments = function(files){
-      if(typeof files === "array"){
+      if(angular.isArray(files)){
         _.each(files,function(file){
           _attachments.push(file);
         });

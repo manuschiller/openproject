@@ -158,7 +158,6 @@ function wpAttachmentsDirective(wpAttachments,
   return {
     restrict: 'E',
     replace: true,
-    require: '^wpSingleView',
     scope: {
       workPackage: '&'
     },

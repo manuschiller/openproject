@@ -37,6 +37,7 @@ export class WorkPackageSingleViewController {
   public hideEmptyFields:boolean = true;
   public filesExist:boolean = false;
   public text:any;
+  public scope:any;
 
   protected firstTimeFocused:boolean = false;
 
@@ -52,6 +53,12 @@ export class WorkPackageSingleViewController {
               protected inplaceEditAll,
               protected wpAttachments,
               protected SingleViewWorkPackage) {
+
+    this.$scope.$watch(()=>{return wpAttachments.getCurrentAttachments()},(attachments)=>{
+      console.log(attachments);
+      alert("new att count: " + attachments.length);
+      this.filesExist = (attachments.length > 0);
+    });
 
     this.groupedFields = WorkPackagesOverviewService.getGroupedWorkPackageOverviewAttributes();
     this.text = {

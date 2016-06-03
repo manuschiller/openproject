@@ -76,9 +76,10 @@ function wpAttachmentsDirective(wpAttachments,
         });
       };
 
-    scope.$watch('attachments',(attachments)=>{
+    scope.$watch(wpAttachments.getCurrentAttachments().length,(attachments)=>{
       console.log('att',attachments);
-      controllers.filesExist = (attachments.length > 0);
+      alert("filesExist changed in directive" + (attachments > 0))
+      controllers.filesExist = (attachments > 0);
     });
 
     scope.$watch('files',(attachments)=>{
@@ -91,19 +92,10 @@ function wpAttachmentsDirective(wpAttachments,
 
     scope.hasRightToUpload = !!(workPackage.$links.addAttachment || workPackage.isNew);
 
-    var currentlyRemoving = [];
     scope.remove = function(file){
-      currentlyRemoving.push(file);
-      wpAttachments.remove(file).then(function (file) {
-        // moved logic to wpAttachments.remove()
-      }).finally(function () {
-        _.remove(currentlyRemoving, file);
-        _.remove(wpAttachments.attachments, file)
+      wpAttachments.remove(file).finally(function () {
+        console.log("removed");
       });
-    };
-
-    scope.deleting = function (attachment) {
-      return _.findIndex(currentlyRemoving, attachment) > -1;
     };
 
     var currentlyFocusing = null;

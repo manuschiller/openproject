@@ -53,11 +53,11 @@ export class WorkPackageSingleViewController {
               protected wpAttachments,
               protected SingleViewWorkPackage) {
 
+    // Ultra ugly - but couldn't bind 'this.files' or 'this.$scope.files'
+    // to wpAttachments.getCurrentAttachments().length > 1 directly
     this.$scope.$watch(()=>{return wpAttachments.getCurrentAttachments()},(attachments)=>{
-      console.log(attachments);
-      alert("new att count: " + attachments.length);
       this.filesExist = (attachments.length > 0);
-    });
+    },true);
 
     this.groupedFields = WorkPackagesOverviewService.getGroupedWorkPackageOverviewAttributes();
     this.text = {
@@ -67,35 +67,14 @@ export class WorkPackageSingleViewController {
       }
     };
 
-    scopedObservable($scope, wpCacheService.loadWorkPackage($stateParams.workPackageId)).subscribe(wp => {
-      this.workPackage = wp;
-      this.singleViewWp = new SingleViewWorkPackage(wp);
-
-      this.workPackage.schema.$load().then(schema => {
-        this.setFocus();
-
-        var otherGroup:any = _.find(this.groupedFields, {groupName: 'other'});
-        otherGroup.attributes = [];
-
-        angular.forEach(schema, (prop, propName) => {
-          if (propName.match(/^customField/)) {
-            otherGroup.attributes.push(propName);
-          }
-        });
-
-        otherGroup.attributes.sort((leftField, rightField) => {
-          var getLabel = field => this.singleViewWp.getLabel(field);
-          var left = getLabel(leftField).toLowerCase();
-          var right = getLabel(rightField).toLowerCase();
-
-          return left.localeCompare(right);
-        });
+    if ($stateParams.workPackageId) {
+      scopedObservable($scope, wpCacheService.loadWorkPackage($stateParams.workPackageId)).subscribe(wp => {
+        this.init(wp);
       });
-
-      wpAttachments.hasAttachments(this.workPackage).then(bool => {
-        this.filesExist = bool;
-      });
-    });
+    }
+    else if (this.workPackage) {
+      this.init(this.workPackage);
+    }
 
     $scope.$on('workPackageUpdatedInEditor', () => {
       NotificationsService.addSuccess({

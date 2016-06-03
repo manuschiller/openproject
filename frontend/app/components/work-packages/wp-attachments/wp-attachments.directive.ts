@@ -44,6 +44,10 @@ function wpAttachmentsDirective(wpAttachments,
 
     console.log(editMode(attrs) ? "edit" : "normal");
 
+    scope.$watch(function(){'attachments'},function(newVal,oldVal){
+      console.log("attachments count changed");
+    },true);
+
     var workPackage = scope.workPackage(),
       upload = function (event, workPackage) {
         if (angular.isUndefined(scope.files)) return;
@@ -65,11 +69,20 @@ function wpAttachmentsDirective(wpAttachments,
         }
       },
       loadAttachments = function () {
+        console.log("in load");
+        console.log("scope.workPackage",workPackage);
         if (!editMode(attrs)) {
           return;
         }
+        console.log("in edit mode");
+        //if(angular.isUndefined(workPackage.$links)){}
+        //  return;
+
+        console.log("$links defined");
         scope.loading = true;
         wpAttachments.load(workPackage, true).then(function (attachments) {
+          console.log("attachments loaded",attachments);
+          wpAttachments.attachments = attachments;
           scope.attachments = wpAttachments.getCurrentAttachments();
         }).finally(function () {
           scope.loading = false;
@@ -80,12 +93,12 @@ function wpAttachmentsDirective(wpAttachments,
     scope.rejectedFiles = [];
     scope.size = ConversionService.fileSize;
 
-    scope.hasRightToUpload = !!(workPackage.$links.addAttachment || workPackage.isNew);
+    scope.hasRightToUpload = !!(workPackage.isNew);
 
     scope.remove = function(file){
-      wpAttachments.remove(file).finally(function () {
-        console.log(wpAttachments.getCurrentAttachments());
-      });
+        wpAttachments.remove(file).finally(function () {
+          console.log(wpAttachments.getCurrentAttachments());
+        });
     };
 
     var currentlyFocusing = null;

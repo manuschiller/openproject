@@ -85,7 +85,8 @@ export class WpAttachmentsFormattableController {
                 }
               else{
                   _.each(dropData.files,(file)=>{
-                    description.insertAttachmentLink(file.name.replace(/ /g , "_"), InsertMode.ATTACHMENT,true);
+                    file.name = file.name.replace(/ /g , "_");
+                    description.insertAttachmentLink(file.name, InsertMode.ATTACHMENT,true);
                     // TODO: solve via service
                     file['isPending'] = true;
                     console.log(file)

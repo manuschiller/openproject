@@ -15,7 +15,7 @@
     </div>
 
     <div class="single-attribute wiki">
-      <wp-field field-name="'description'"></wp-field>
+      <wp-field field-name="'description'" wp-attachments-formattable></wp-field>
     </div>
 
     <div ng-repeat="group in vm.groupedFields"
@@ -53,7 +53,11 @@
         </div>
       </div>
     </div>
-    <work-package-attachments work-package="vm.workPackage" data-ng-show="!vm.hideEmptyFields"></work-package-attachments>
+    <wp-attachments
+            edit
+            work-package="vm.workPackage"
+            data-ng-show="!vm.hideEmptyFields || vm.filesExist">
+    </wp-attachments>
   </div>
 </div>
 

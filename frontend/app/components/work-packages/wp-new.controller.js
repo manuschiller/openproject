@@ -43,12 +43,18 @@ function WorkPackageNewController($scope,
                                   NotificationsService,
                                   inplaceEditAll,
                                   inplaceEditMultiStorage,
+                                  wpAttachments,
                                   loadingIndicator) {
 
   var vm = this;
 
   vm.groupedFields = [];
   vm.hideEmptyFields = true;
+  $scope.$watch(function(){return wpAttachments.getCurrentAttachments().length;},function(attachmentCount){
+    vm.filesExist = (attachmentCount > 0);
+  },true);
+
+  wpAttachments.resetAttachmentsList();
 
   vm.loaderPromise = null;
 
@@ -82,7 +88,11 @@ function WorkPackageNewController($scope,
   vm.showToggleButton = WorkPackagesDisplayHelper.showToggleButton;
 
   vm.notifyCreation = function() {
-    inplaceEditMultiStorage.save().then(function() {
+    inplaceEditMultiStorage.save().then(function(wp) {
+      console.log("wp",wp);
+      console.log(inplaceEditMultiStorage);
+      console.log(inplaceEditAll);
+      console.log(EditableFieldsState);
       $rootScope.$emit('workPackagesRefreshInBackground');
       NotificationsService.addSuccess({
         message: I18n.t('js.notice_successful_create'),

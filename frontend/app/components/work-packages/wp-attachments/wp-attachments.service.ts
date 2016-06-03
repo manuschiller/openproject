@@ -76,7 +76,6 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
         var path = workPackage.$links.attachments.$link.href;
 
         $http.get(path, {cache: !reload}).success(response => {
-          _attachments = response._embedded.elements;
           attachments.resolve(response._embedded.elements);
         }).error(err => {
           attachments.reject(err);
@@ -91,16 +90,22 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
 
     remove = function (fileOrAttachment) {
       var removal = $q.defer();
+      if(fileOrAttachment.isPending){
+        _.remove(_attachments,fileOrAttachment);
+        return;
+      }
       if (angular.isObject(fileOrAttachment._links)) {
         var path = fileOrAttachment._links.self.href;
         $http.delete(path).success(function () {
+          console.log("attachments before", _attachments);
           _.remove(_attachments,fileOrAttachment);
-          console.log("getCurrentAttachments:", getCurrentAttachments());
+          console.log("getCurrentAttachments after:", getCurrentAttachments());
           removal.resolve(fileOrAttachment);
         }).error(function (err) {
           removal.reject(err);
         });
       } else {
+        alert("_links undefined");
         removal.resolve(fileOrAttachment);
       }
       return removal.promise;
@@ -131,6 +136,7 @@ function wpAttachmentsService($q, $timeout, $http, Upload, I18n, NotificationsSe
       }else{
         _attachments.push(files);
       }
+      console.log("after append: ", _attachments);
     },
 
     _attachments = [],

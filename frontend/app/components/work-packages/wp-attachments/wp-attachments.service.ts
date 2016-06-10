@@ -31,6 +31,7 @@ import ArrayLiteralExpression = ts.ArrayLiteralExpression;
 import {WorkPackageResource} from "./../../api/api-v3/hal-resources/work-package-resource.service"
 
 export class WpAttachmentsService {
+  
   public attachments: Array<any> = [];
 
   constructor(
@@ -85,8 +86,9 @@ export class WpAttachmentsService {
     if (angular.isDefined(workPackage.$links.attachments)) {
       let path: string = workPackage.$links.attachments.$link.href;
       this.$http.get(path, {cache: !reload}).success(response => {
-        this.attachments = response._embedded.elements;
-        loadedAttachments.resolve(response._embedded.elements);
+        _.remove(this.attachments);
+        _.extend(this.attachments, response._embedded.elements);
+        loadedAttachments.resolve(this.attachments);
       }).error(err => {
         loadedAttachments.reject(err);
       });

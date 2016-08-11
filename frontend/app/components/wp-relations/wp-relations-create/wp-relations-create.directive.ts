@@ -5,7 +5,7 @@ export class WpRelationsCreateController {
   public showRelationsCreateForm: boolean = false;
   public relationTypes;
   public selectedRelationType;
-  public wpToAddId;
+  public wpToAddId = 150;
   protected relationTitles;
 
   constructor(protected $scope,
@@ -32,9 +32,9 @@ export class WpRelationsCreateController {
   public createRelation() {
     console.log("relationType",this.selectedRelationType);
     console.log("wpToAddId",this.wpToAddId);
-    this.selectedRelationType.addRelation(this.wpToAddId).then((res)=>{
+    /*this.selectedRelationType.addWpRelation(this.wpToAddId).then((res)=>{
       console.log("added",res);
-    })
+    });*/
   }
 
   public toggleRelationsCreateForm() {

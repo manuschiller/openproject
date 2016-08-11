@@ -26,21 +26,21 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-import {wpTabsModule} from "../../../angular-modules";
-import {WorkPackageRelationsController} from "../wp-relations.directive";
+import {wpTabsModule} from "../../../../angular-modules";
 
 function wpRelationsAutocompleteDirective(I18n) {
   return {
     restrict: 'E',
-    templateUrl: '/components/wp-relations/wp-relations-autocomplete/wp-relations-autocomplete.template.html',
+    templateUrl: '/components/wp-relations/wp-relations-create/wp-relations-autocomplete/wp-relations-autocomplete.template.html',
     scope: {
-      wpToAddId: '=',
+      selectedWpId: '=',
       selectedRelationType: '='
     },
     link: function (scope) {
+      scope.testS = "hallo welt";
+      scope.$watch(function(){return scope.selectedWpId},function(n){console.log("new wp:",n)});
       scope.autocompleteWorkPackages = (term) => {
         if (!term || !scope.selectedRelationType) {
-          console.log("condition not met");
           return;
         }
 

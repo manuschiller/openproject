@@ -212,6 +212,7 @@ export class WorkPackageEditFieldController {
   }
 
   public handleUserActivate() {
+    console.log(this.field);
     this.activate(true).then((active) => {
       // Display a generic error if the field turns out not to be editable,
       // despite the field being editable.
@@ -312,7 +313,6 @@ function wpEditField(wpCacheService: WorkPackageCacheService) {
                            element,
                            attrs,
                            controllers: [WorkPackageEditFormController, WorkPackageEditFieldController]) {
-
     var formCtrl = controllers[0];
     controllers[1].formCtrl = formCtrl;
 

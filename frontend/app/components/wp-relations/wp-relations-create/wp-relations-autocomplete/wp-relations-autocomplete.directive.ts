@@ -26,7 +26,7 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-import {wpTabsModule} from "../../../../angular-modules";
+import {wpTabsModule} from '../../../../angular-modules';
 
 function wpRelationsAutocompleteDirective(I18n) {
   return {
@@ -37,8 +37,10 @@ function wpRelationsAutocompleteDirective(I18n) {
       selectedRelationType: '='
     },
     link: function (scope) {
-      scope.testS = "hallo welt";
-      scope.$watch(function(){return scope.selectedWpId},function(n){console.log("new wp:",n)});
+      scope.onSelect = function(wpId){
+        scope.selectedWpId = wpId;
+      };
+
       scope.autocompleteWorkPackages = (term) => {
         if (!term || !scope.selectedRelationType) {
           return;

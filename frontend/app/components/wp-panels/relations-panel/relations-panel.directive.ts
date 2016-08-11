@@ -53,6 +53,7 @@ export class RelationsPanelController {
 
     this.workPackage.relations.$load().then(() => {
       this.relationGroups = wpRelations.getWpRelationGroups(this.workPackage);
+      console.log(this.relationGroups);
     });
   }
 

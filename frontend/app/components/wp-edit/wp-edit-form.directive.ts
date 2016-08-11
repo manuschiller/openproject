@@ -113,9 +113,11 @@ export class WorkPackageEditFormController {
   }
 
   public updateWorkPackage() {
+    alert("update wp");
     if (!(this.workPackage.dirty || this.workPackage.isNew)) {
       return this.$q.when(this.workPackage);
     }
+    alert("conditions met");
 
     var deferred = this.$q.defer();
     var isInitial = this.workPackage.isNew;

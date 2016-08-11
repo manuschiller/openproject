@@ -5,8 +5,8 @@ export class WpRelationsCreateController {
   public showRelationsCreateForm: boolean = false;
   public relationTypes;
   public selectedRelationType;
-  public wpToAddId = 150;
-  protected relationTitles;
+  public selectedWpId:number;
+  protected relationTitles:Object;
 
   constructor(protected $scope,
               protected NotificationsService,
@@ -26,15 +26,14 @@ export class WpRelationsCreateController {
       follows: I18n.t('js.relation_labels.follows')
     };
 
+    // Default relationType
     this.selectedRelationType = _.find(this.relationTypes, {name: 'relatedTo'});
   }
-  
+
   public createRelation() {
-    console.log("relationType",this.selectedRelationType);
-    console.log("wpToAddId",this.wpToAddId);
-    /*this.selectedRelationType.addWpRelation(this.wpToAddId).then((res)=>{
-      console.log("added",res);
-    });*/
+    this.selectedRelationType.addWpRelation(this.selectedWpId).then((res) => {
+      this.NotificationsService.addSuccess('Relation saved');
+    });
   }
 
   public toggleRelationsCreateForm() {

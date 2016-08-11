@@ -29,7 +29,7 @@
 import {wpTabsModule} from "../../../angular-modules";
 import {WorkPackageRelationsController} from "../wp-relations.directive";
 
-function wpRelationRowDirective(PathHelper) {
+function wpRelationRowDirective(PathHelper,$rootScope) {
   var getFullIdentifier = (workPackage) => {
     var type = ' ';
 
@@ -50,6 +50,12 @@ function wpRelationRowDirective(PathHelper) {
         scope.fullIdentifier = getFullIdentifier(relatedWorkPackage);
         scope.state = relatedWorkPackage.status.isClosed ? 'closed' : '';
       });
+
+    scope.onWorkPackageSave = function(workPackage) {
+      alert("saved!");
+      $rootScope.$emit('workPackageSaved', workPackage);
+      $rootScope.$emit('workPackagesRefreshInBackground');
+    } ;
   }
 
   return {

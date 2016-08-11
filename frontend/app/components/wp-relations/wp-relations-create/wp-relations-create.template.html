@@ -1,0 +1,43 @@
+<div>
+    <div class="wp-inline-create-button">
+        <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" ng-if="!$relationsCreateCtrl.showRelationsCreateForm">
+            <i class="icon icon-add"></i>
+            <span>Create new relation</span>
+        </a>
+    </div>
+    <div ng-if="$relationsCreateCtrl.showRelationsCreateForm">
+        <!-- TODO: get foundation's grid system to work.. -->
+        <table style="width:100%">
+            <tbody>
+            <tr>
+                <td style="min-width: 30%">
+                    <select
+                            class="relationTypeSelect"
+                            ng-model="$relationsCreateCtrl.selectedRelationType"
+                            ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
+                    </select>
+                </td>
+                <td style="max-width: 50%;">
+                    <wp-relations-autocomplete
+                    wp-to-add-id="$relationsCreateCtrl.wpToAddId"
+                    selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
+                </td>
+                <td style="min-width: 10%; text-align:right;">
+                        <span style="text-align:right" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" class="icon-context icon-button icon-remove " title="Remove relation" icon-name="remove" icon-title="Remove relation">
+                          <span class="hidden-for-sighted ng-binding">Remove relation</span>
+                        </span>
+                </td>
+                <td style="width: 10%; text-align:right;">
+                        <span style="text-align:right" ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark" title="Save relation" icon-name="checkmark" icon-title="Remove relation">
+                          <span class="hidden-for-sighted ng-binding">Save relation</span>
+                        </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+

@@ -710,6 +710,3 @@ DEPENDENCIES
   warden-basic_auth (~> 0.2.1)
   webmock (~> 1.24.2)
   will_paginate (~> 3.1)
-
-BUNDLED WITH
-   1.12.5

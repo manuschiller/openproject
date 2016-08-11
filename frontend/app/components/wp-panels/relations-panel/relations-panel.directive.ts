@@ -55,6 +55,14 @@ export class RelationsPanelController {
       this.relationGroups = wpRelations.getWpRelationGroups(this.workPackage);
     });
   }
+
+  public getParents() {
+    return _.find(this.relationGroups, {type: 'parent'});
+  }
+
+  public getChildren() {
+    return _.find(this.relationGroups, {type: 'children'});
+  }
 }
 
 function relationsPanelDirective() {

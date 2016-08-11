@@ -1,4 +1,4 @@
-<div ng-class="['relation', $ctrl.relationGroup.id]">
+<div ng-class="['relation', $ctrl.relationGroup.id]" ng-hide="$ctrl.relationGroup.relations.length === 0">
   <h3>
     <accessible-by-keyboard execute="$ctrl.toggleExpand()"
                             link-class="{{ $ctrl.relationGroup.id }}-toggle-link">
@@ -68,26 +68,6 @@
       <div ng-if="$ctrl.relationGroup.isEmpty">
         {{ $ctrl.text.relations.empty }}
       </div>
-    </div>
-    <div
-        class="add-relation"
-        ng-if="$ctrl.relationGroup.canAddRelation"
-        ng-switch="$ctrl.relationGroup.type"
-        focus="$ctrl.isFocused(-1)">
-
-      <!-- Add WP child -->
-      <button
-          ng-switch-when="children"
-          class="button add-work-package-child-button"
-          title="{{ $ctrl.btnTitle }}"
-          ng-bind-html="$ctrl.btnIcon + ' ' + $ctrl.btnTitle"
-          ng-click="$ctrl.addRelation()"
-          focus="$ctrl.isFocused(-1)"
-      ></button>
-
-
-      <!-- Add WP relation -->
-      <add-wp-relation ng-switch-default></add-wp-relation>
     </div>
   </div>
 </div>

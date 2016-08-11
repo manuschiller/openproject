@@ -1,0 +1,32 @@
+<div>
+    <h3>
+        <accessible-by-keyboard execute="$ctrl.toggleExpand()">
+            <i class="icon-pull-content" ng-class="$ctrl.stateClass"></i> Hierarchy
+        </accessible-by-keyboard>
+    </h3>
+    <table>
+        <tr ng-repeat="parent in $ctrl.parents.relations">
+            <td>
+                <span>
+                    <a href="{{parent.$links.activities}}">{{$ctrl.getFullIdentifier(parent)}}</a>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-left:20px">
+                <span>
+                    <a href="{{$ctrl.workPackage.$links.activities}}">
+                        <strong>{{$ctrl.getFullIdentifier($ctrl.workPackage)}}</strong>
+                    </a>
+                </span>
+            </td>
+        </tr>
+        <tr ng-repeat="child in $ctrl.children.relations">
+            <td style="padding-left:40px">
+                <span>
+                    <a href="{{child.$links.activities}}">{{$ctrl.getFullIdentifier(child)}}</a>
+                </span>
+            </td>
+        </tr>
+    </table>
+</div>

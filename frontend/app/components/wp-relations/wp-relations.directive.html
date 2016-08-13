@@ -22,7 +22,6 @@
             <tr>
               <th title="{{ $ctrl.text.table.subject }}">{{ $ctrl.text.table.subject }}</th>
               <th title="{{ $ctrl.text.table.status }}">{{ $ctrl.text.table.status }}</th>
-              <th title="{{ $ctrl.text.table.assignee }}">{{ $ctrl.text.table.assignee }}</th>
               <th></th>
             </tr>
           </thead>
@@ -36,37 +35,15 @@
                 </a>
               </td>
               <td title="{{ relatedWorkPackage.status.name }}">
-                <div wp-edit-form="relatedWorkPackage" ng-if="relatedWorkPackage"
-                     wp-edit-form-on-save="onWorkPackageSave(relatedWorkPackage)"
-                     wp-edit-form-on-error="onWorkPackageSave(relatedWorkPackage)">
+                <div wp-edit-form="relatedWorkPackage" ng-if="relatedWorkPackage">
                   <div
                           wp-edit-field="'status'"
                           wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
                   </div>
                 </div>
               </td>
-              <td>
-                <div wp-edit-form="relatedWorkPackage" ng-if="relatedWorkPackage">
-                  <div
-                          wp-edit-field="'assignee'"
-                          wp-edit-field-wrapper-classes="'-no-label'"
-                          class="single-attribute -small -shrink">
-                  </div>
-                </div>
-                <!--<a
-                        ng-if="relatedWorkPackage.assignee
-                 && relatedWorkPackage.assignee.subtype != 'Group'"
-                        title="{{ relatedWorkPackage.assignee.name }}"
-                        href="{{ userPath(relatedWorkPackage.assignee.id) }}">
-                  {{ relatedWorkPackage.assignee.name }}
-                </a>
-                <span ng-if="relatedWorkPackage.assignee
-                 && relatedWorkPackage.assignee.subtype == 'Group'">
-                  {{ relatedWorkPackage.assignee.name }}
-                </span>-->
-                <!--<empty-element ng-if="!relatedWorkPackage.assignee"></empty-element>-->
-              </td>
-              <td class="icon">
+
+              <td class="icon" style="text-align:right">
                 <accessible-by-keyboard ng-if="$ctrl.canRemoveRelation(relation)"
                                         execute="$ctrl.removeRelation(relation)">
                   <icon-wrapper icon-name="remove"

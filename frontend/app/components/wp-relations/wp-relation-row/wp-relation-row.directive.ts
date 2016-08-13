@@ -28,8 +28,12 @@
 
 import {wpTabsModule} from "../../../angular-modules";
 import {WorkPackageRelationsController} from "../wp-relations.directive";
+import {
+  WorkPackageResource,
+  WorkPackageResourceInterface
+} from "../../api/api-v3/hal-resources/work-package-resource.service";
 
-function wpRelationRowDirective(PathHelper,$rootScope) {
+function wpRelationRowDirective(PathHelper, $rootScope, wpCacheService) {
   var getFullIdentifier = (workPackage) => {
     var type = ' ';
 
@@ -44,18 +48,15 @@ function wpRelationRowDirective(PathHelper,$rootScope) {
     scope.workPackagePath = PathHelper.workPackagePath;
     scope.userPath = PathHelper.userPath;
 
+    // TODO: must be possible easier..
     scope.$ctrl.relationGroup.getRelatedWorkPackage(scope.relation)
-      .then(relatedWorkPackage => {
-        scope.relatedWorkPackage = relatedWorkPackage;
-        scope.fullIdentifier = getFullIdentifier(relatedWorkPackage);
-        scope.state = relatedWorkPackage.status.isClosed ? 'closed' : '';
+      .then((relatedWorkPackage) => {
+        wpCacheService.loadWorkPackage(relatedWorkPackage.id).subscribe(relatedWp => {
+          scope.relatedWorkPackage = relatedWp;
+          scope.fullIdentifier = getFullIdentifier(relatedWp);
+          scope.state = relatedWp.status.isClosed ? 'closed' : '';
+        });
       });
-
-    scope.onWorkPackageSave = function(workPackage) {
-      alert("saved!");
-      $rootScope.$emit('workPackageSaved', workPackage);
-      $rootScope.$emit('workPackagesRefreshInBackground');
-    } ;
   }
 
   return {

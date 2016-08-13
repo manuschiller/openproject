@@ -28,22 +28,30 @@
 
 import {wpTabsModule} from '../../../angular-modules';
 
-export class WorkPackageRelationsHierarchyController {
+interface HierarchyControllerInterface {
+  relationGroups:any;
+  getFullIdentifier:any;
+  parents:any;
+  children:any;
+}
+
+export class WorkPackageRelationsHierarchyController implements HierarchyControllerInterface{
   public relationGroups;
+  public parents;
+  public children;
+
   constructor(protected $scope) {
-      console.log("parents", this.parents);
-      console.log("children", this.children);
   }
-  
+
   public getFullIdentifier = (workPackage) => {
-  var type = ' ';
+    var type = ' ';
 
-  if (workPackage.type) {
-    type += workPackage.type.name + ': ';
-  }
+    if (workPackage.type) {
+      type += workPackage.type.name + ': ';
+    }
 
-  return `#${workPackage.id}${type}${workPackage.subject}`;
-};
+    return `#${workPackage.id}${type}${workPackage.subject}`;
+  };
 }
 
 function wpRelationsDirective() {

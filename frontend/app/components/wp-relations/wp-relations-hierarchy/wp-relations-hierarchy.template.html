@@ -1,8 +1,6 @@
-<div>
+<div ng-hide="$ctrl.parents.relations.length === 0 && $ctrl.children.relations.length === 0">
     <h3>
-        <accessible-by-keyboard execute="$ctrl.toggleExpand()">
-            <i class="icon-pull-content" ng-class="$ctrl.stateClass"></i> Hierarchy
-        </accessible-by-keyboard>
+        Hierarchy
     </h3>
     <table>
         <tr ng-repeat="parent in $ctrl.parents.relations">
@@ -13,7 +11,7 @@
             </td>
         </tr>
         <tr>
-            <td style="padding-left:20px">
+            <td ng-style="{paddingLeft: $ctrl.parents.relations.length > 0 ? 20 : 0}">
                 <span>
                     <a href="{{$ctrl.workPackage.$links.activities}}">
                         <strong>{{$ctrl.getFullIdentifier($ctrl.workPackage)}}</strong>
@@ -22,7 +20,7 @@
             </td>
         </tr>
         <tr ng-repeat="child in $ctrl.children.relations">
-            <td style="padding-left:40px">
+            <td ng-style="{paddingLeft: $ctrl.parents.relations.length > 0 ? 40 : 20}" ng-init="$ctrl.padding.children = ($ctrl.parents.relations.length > 0) ? 40 : 20">
                 <span>
                     <a href="{{child.$links.activities}}">{{$ctrl.getFullIdentifier(child)}}</a>
                 </span>

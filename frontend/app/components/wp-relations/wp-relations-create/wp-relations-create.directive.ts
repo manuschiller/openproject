@@ -36,8 +36,13 @@ export class WpRelationsCreateController {
     });
   }
 
-  public toggleRelationsCreateForm() {
-    this.showRelationsCreateForm = !this.showRelationsCreateForm;
+  public toggleRelationsCreateForm(creationMode:string) {
+    if (creationMode === 'createChildWp') {
+      _.find(this.relationTypes, {type: 'children'}).addWpRelation();
+    } else {
+      this.showRelationsCreateForm = !this.showRelationsCreateForm;
+    }
+
   }
 }
 

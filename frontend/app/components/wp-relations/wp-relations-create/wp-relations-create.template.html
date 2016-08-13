@@ -1,9 +1,22 @@
 <div>
-    <div class="wp-inline-create-button">
-        <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" ng-if="!$relationsCreateCtrl.showRelationsCreateForm">
-            <i class="icon icon-add"></i>
-            <span>Create new relation</span>
-        </a>
+    <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm">
+        <table>
+            <tr>
+                <td style="width:50%;">
+                    <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                        <i class="icon icon-add"></i>
+                        <span>Create new relation</span>
+                    </a>
+                </td>
+                <td style="width:50%;">
+                    <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm('createChildWp')">
+                        <i class="icon icon-add"></i>
+                        <span>Create new child work package</span>
+                    </a>
+                </td>
+            </tr>
+        </table>
+
     </div>
     <div ng-if="$relationsCreateCtrl.showRelationsCreateForm">
         <!-- TODO: get foundation's grid system to work.. -->

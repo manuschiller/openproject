@@ -41,6 +41,7 @@ export class WpRelationsCreateController {
     }
 
     this.selectedRelationType.addWpRelation(this.selectedWpId).then((res) => {
+      this.toggleRelationsCreateForm();
       this.NotificationsService.addSuccess('Relation saved');
     });
   }

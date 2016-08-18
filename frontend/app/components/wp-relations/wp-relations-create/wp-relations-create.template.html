@@ -1,61 +1,43 @@
 <div>
-    <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm">
-        <table>
-            <tr>
-                <td style="width:50%;">
+
+    <div class="grid-frame">
+        <!-- TODO: MOVE STYLE ATTR TO CLASS -->
+        <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
+            <div class="grid-block">
+                <div class="grid-content collapse">
                     <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
                         <i class="icon icon-add"></i>
                         <span>Create new relation</span>
                     </a>
-                </td>
-                <td style="width:50%;">
+                </div>
+                <div class="grid-content collapse">
                     <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm('createChildWp')">
                         <i class="icon icon-add"></i>
                         <span>Create new child work package</span>
                     </a>
-                </td>
-            </tr>
-        </table>
 
+                </div>
+            </div>
+        </div>
     </div>
-    <div ng-if="$relationsCreateCtrl.showRelationsCreateForm">
-        <!-- TODO: get foundation's grid system to work.. -->
-        <table style="width:100%">
-            <tbody>
-            <tr>
-                <td style="min-width: 30%">
-                    <select
-                            class="relationTypeSelect"
-                            ng-model="$relationsCreateCtrl.selectedRelationType"
-                            ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
-                    </select>
-                </td>
-                <td style="max-width: 50%;">
-                    <wp-relations-autocomplete
+    <div class="grid-block" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
+        <div class="grid-content medium-3">
+            <select
+                    class="relationTypeSelect"
+                    ng-model="$relationsCreateCtrl.selectedRelationType"
+                    ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
+            </select>
+        </div>
+        <div class="grid-content medium-7">
+            <wp-relations-autocomplete
                     selected-wp-id="$relationsCreateCtrl.selectedWpId"
                     selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
-                </td>
-                <td style="min-width: 10%; text-align:right;">
-                        <span style="text-align:right" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" class="icon-context icon-button icon-remove " title="Remove relation" icon-name="remove" icon-title="Remove relation">
-                          <span class="hidden-for-sighted ng-binding">Remove relation</span>
-                        </span>
-                </td>
-                <td style="width: 10%; text-align:right;">
-                        <span style="text-align:right" ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark" title="Save relation" icon-name="checkmark" icon-title="Remove relation">
-                          <span class="hidden-for-sighted ng-binding">Save relation</span>
-                        </span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-        <div class="grid-block">
-            <div class="grid-content medium-6">
-            links
-            </div>
-            <div class="grid-content medium-6">
-                rechts
-            </div>
+        </div>
+        <div class="grid-content medium-2">
+             <span style="text-align:right" ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark" title="Save relation" icon-name="checkmark" icon-title="Remove relation">
+                      <span class="hidden-for-sighted ng-binding">Save relation</span>
+                    </span>
+        </div>
     </div>
 </div>
 

@@ -31,6 +31,7 @@ import {wpTabsModule} from '../../../angular-modules';
 
 var $state:ng.ui.IStateService;
 var $q:ng.IQService;
+var wpCacheService;
 
 export class WorkPackageChildRelationsGroup extends WorkPackageRelationGroup {
   public get canAddRelation() {
@@ -76,6 +77,7 @@ export class WorkPackageChildRelationsGroup extends WorkPackageRelationGroup {
           .then(() => {
             this.relations.splice(index, 1);
             deferred.resolve(index);
+            wpCacheService.updateWorkPackage(workPackage);
           })
           .catch(deferred.reject);
       })
@@ -92,11 +94,11 @@ export class WorkPackageChildRelationsGroup extends WorkPackageRelationGroup {
 }
 
 function wpChildRelationsGroupService(...args) {
-  [$state, $q] = args;
+  [$state, $q, wpCacheService] = args;
   return WorkPackageChildRelationsGroup;
 }
 
-wpChildRelationsGroupService.$inject = ['$state', '$q'];
+wpChildRelationsGroupService.$inject = ['$state', '$q', 'wpCacheService'];
 
 
 wpTabsModule.factory('WorkPackageChildRelationsGroup', wpChildRelationsGroupService);

@@ -27,17 +27,23 @@
 // ++
 
 import {wpDirectivesModule} from "../../../angular-modules";
-import {WorkPackageResourceInterface} from "../../api/api-v3/hal-resources/work-package-resource.service";
+import {
+  WorkPackageResourceInterface,
+  WorkPackageResource
+} from "../../api/api-v3/hal-resources/work-package-resource.service";
 import {scopedObservable} from "../../../helpers/angular-rx-utils";
 import {WorkPackageRelationsService} from "../../wp-relations/wp-relations.service";
 
 export class RelationsPanelController {
   public workPackage:WorkPackageResourceInterface;
   public relationTitles;
-  public relationGroups;
+  public relationGroups = [];
+  public hasRelations: boolean;
 
   constructor(I18n: op.I18n,
-              wpRelations:WorkPackageRelationsService) {
+              protected $scope,
+              protected wpCacheService,
+              protected wpRelations:WorkPackageRelationsService) {
 
     this.relationTitles = {
       parent: I18n.t('js.relation_buttons.change_parent'),
@@ -51,8 +57,21 @@ export class RelationsPanelController {
       follows: I18n.t('js.relation_buttons.add_follows')
     };
 
+    this.wpCacheService.loadWorkPackage(this.workPackage.id).subscribe(wp => {
+      this.hasRelations = this.checkRelations();
+    });
+
+    this.loadRelations();
+    //wpCacheService.loadWorkPackageLinks(this.workPackage,'relations');
+
+
+  }
+
+  public loadRelations() {
     this.workPackage.relations.$load().then(() => {
-      this.relationGroups = wpRelations.getWpRelationGroups(this.workPackage);
+      this.relationGroups.length = 0;
+      angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(this.workPackage));
+      this.hasRelations = this.checkRelations();
     });
   }
 
@@ -62,6 +81,17 @@ export class RelationsPanelController {
 
   public getChildren() {
     return _.find(this.relationGroups, {type: 'children'});
+  }
+
+  protected checkRelations() {
+    var hasRelations = false;
+    this.relationGroups.forEach((group) => {
+      if (group.relations.length > 0) {
+        hasRelations = true;
+        return;
+      }
+    });
+    return hasRelations;
   }
 }
 

@@ -41,6 +41,7 @@ export class WorkPackageRelationsHierarchyController implements HierarchyControl
   public children;
 
   constructor(protected $scope) {
+    console.log(this.parents);
   }
 
   public getFullIdentifier = (workPackage) => {

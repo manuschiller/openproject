@@ -2,29 +2,34 @@
     <h3>
         Hierarchy
     </h3>
-    <table>
-        <tr ng-repeat="parent in $ctrl.parents.relations">
-            <td>
-                <span>
-                    <a href="{{parent.$links.activities}}">{{$ctrl.getFullIdentifier(parent)}}</a>
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td ng-style="{paddingLeft: $ctrl.parents.relations.length > 0 ? 20 : 0}">
-                <span>
+
+    <div class="grid-block" ng-repeat="parent in $ctrl.parents.relations">
+        <div class="grid-content">
+            <span>
+                <a href="{{parent.$links.activities}}">{{$ctrl.getFullIdentifier(parent)}}</a>
+            </span>
+        </div>
+    </div>
+
+    <div  ng-style="{paddingLeft: $ctrl.parents.isEmpty ? 0 : 20}">
+        <div class="grid-block">
+            <div class="grid-content">
+            <span>
                     <a href="{{$ctrl.workPackage.$links.activities}}">
                         <strong>{{$ctrl.getFullIdentifier($ctrl.workPackage)}}</strong>
                     </a>
                 </span>
-            </td>
-        </tr>
-        <tr ng-repeat="child in $ctrl.children.relations">
-            <td ng-style="{paddingLeft: $ctrl.parents.relations.length > 0 ? 40 : 20}" ng-init="$ctrl.padding.children = ($ctrl.parents.relations.length > 0) ? 40 : 20">
-                <span>
-                    <a href="{{child.$links.activities}}">{{$ctrl.getFullIdentifier(child)}}</a>
-                </span>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
+
+    <div ng-style="{paddingLeft: $ctrl.parents.isEmpty ? 20 : 40}">
+        <div class="grid-block" ng-repeat="child in $ctrl.children.relations">
+            <div class="grid-content">
+            <span>
+                <a href="{{child.$links.activities}}">test {{$ctrl.getFullIdentifier(child)}}</a>
+            </span>
+            </div>
+        </div>
+    </div>
 </div>

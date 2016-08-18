@@ -77,7 +77,10 @@ export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
     return this.workPackage.changeParent(params)
       .then((wp) => {
         this.workPackage = wp;
-        return wpCacheService.updateWorkPackage(wp);
+        wpCacheService.loadWorkPackage(parentId,true).first().subscribe(parentWp => {
+          return wpCacheService.updateWorkPackageList([wp, parentWp]);
+        });
+
       })
       .catch(error => {
         if (error instanceof ErrorResource) {

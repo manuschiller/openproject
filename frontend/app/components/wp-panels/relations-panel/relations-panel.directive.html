@@ -1,5 +1,14 @@
 <div class="detail-panel-description" ng-if="$ctrl.workPackage">
   <div class="detail-panel-description-content">
+
+    <div class="generic-table--no-results-container" ng-if="!$ctrl.hasRelations">
+      <i class="icon-info1"></i>
+      <span class="generic-table--no-results-title">
+        This work package has no relations.
+      </span>
+      </div>
+    </div>
+
     <wp-relations-hierarchy
       work-package="$ctrl.workPackage"
       parents="$ctrl.getParents()"
@@ -11,6 +20,8 @@
         relation-group="relationGroup"
     ></wp-relations>
     <wp-relations-create
-      relation-types="$ctrl.relationGroups"></wp-relations-create>
+      work-package="$ctrl.workPackage"
+      relation-types="$ctrl.relationGroups"
+      reload-relations="$ctrl.loadRelations()"></wp-relations-create>
   </div>
 </div>

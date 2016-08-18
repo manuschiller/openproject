@@ -7,11 +7,14 @@ export class WpRelationsCreateController {
   public selectedRelationType;
   public selectedWpId:number;
   protected relationTitles:Object;
+  public workPackage;
 
   constructor(protected $scope,
               protected NotificationsService,
               protected wpRelations,
+              protected WorkPackageParentRelationGroup,
               protected I18n,
+              protected wpCacheService,
               protected wpNotificationsService) {
 
     this.relationTitles = {
@@ -31,8 +34,26 @@ export class WpRelationsCreateController {
   }
 
   public createRelation() {
+
+    if (this.selectedRelationType.name === 'children') {
+      this.addExistingChildWorkPackage();
+      return;
+    }
+
     this.selectedRelationType.addWpRelation(this.selectedWpId).then((res) => {
       this.NotificationsService.addSuccess('Relation saved');
+    });
+  }
+
+  protected addExistingChildWorkPackage(){
+    this.wpCacheService.loadWorkPackage(this.selectedWpId).first().subscribe(childWp => {
+      childWp.changeParent({
+        parentId: this.workPackage.id,
+        lockVersion: childWp.lockVersion
+      }).then( (wp) => {
+        this.wpCacheService.updateWorkPackage([wp, childWp]);
+        this.reloadRelations();
+      });
     });
   }
 
@@ -55,7 +76,9 @@ function wpRelationsCreate() {
     bindToController: true,
     controllerAs: '$relationsCreateCtrl',
     scope: {
-      relationTypes: '='
+      relationTypes: '=',
+      workPackage: '=',
+      reloadRelations: '&'
     }
   };
 }

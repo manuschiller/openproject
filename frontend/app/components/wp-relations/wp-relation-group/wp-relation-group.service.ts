@@ -35,6 +35,7 @@ declare var URI:any;
 var $q:ng.IQService;
 var $http:ng.IHttpService;
 var PathHelper:any;
+var wpCacheService;
 
 export class WorkPackageRelationGroup {
   public relations = [];
@@ -127,10 +128,10 @@ export class WorkPackageRelationGroup {
 }
 
 function wpRelationGroupService(...args) {
-  [$q, $http, PathHelper] = args;
+  [$q, $http, PathHelper, wpCacheService] = args;
   return WorkPackageRelationGroup;
 }
 
-wpRelationGroupService.$inject = ['$q', '$http', 'PathHelper'];
+wpRelationGroupService.$inject = ['$q', '$http', 'PathHelper', 'wpCacheService'];
 
 wpTabsModule.factory('WorkPackageRelationGroup', wpRelationGroupService);

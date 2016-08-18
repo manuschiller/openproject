@@ -49,9 +49,16 @@ function wpRelationRowDirective(PathHelper, $rootScope, wpCacheService) {
     scope.userPath = PathHelper.userPath;
 
     // TODO: must be possible easier..
+    scope.relation.$load().then(wp => {
+        var wpByRelation = wp;
+        wpCacheService.loadWorkPackage(wpByRelation.id).first().subscribe(wp2=>{
+        
+        });
+    });
+
     scope.$ctrl.relationGroup.getRelatedWorkPackage(scope.relation)
       .then((relatedWorkPackage) => {
-        wpCacheService.loadWorkPackage(relatedWorkPackage.id).subscribe(relatedWp => {
+        wpCacheService.loadWorkPackage(relatedWorkPackage.id,true).first().subscribe(relatedWp => {
           scope.relatedWorkPackage = relatedWp;
           scope.fullIdentifier = getFullIdentifier(relatedWp);
           scope.state = relatedWp.status.isClosed ? 'closed' : '';

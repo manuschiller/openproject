@@ -1,6 +1,5 @@
 <div>
 
-    <div class="grid-frame">
         <!-- TODO: MOVE STYLE ATTR TO CLASS -->
         <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
             <div class="grid-block">
@@ -15,30 +14,34 @@
                         <i class="icon icon-add"></i>
                         <span>Create new child work package</span>
                     </a>
-
                 </div>
             </div>
         </div>
-    </div>
-    <div class="grid-block" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
-        <div class="grid-content medium-3">
-            <select
-                    class="relationTypeSelect"
-                    ng-model="$relationsCreateCtrl.selectedRelationType"
-                    ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
-            </select>
+        <div class="grid-block v-align" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
+            <div class="grid-content collapse medium-3">
+                <select
+                        class="relationTypeSelect"
+                        ng-model="$relationsCreateCtrl.selectedRelationType"
+                        ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
+                </select>
+            </div>
+            <div class="grid-content medium-7">
+                <wp-relations-autocomplete
+                        selected-wp-id="$relationsCreateCtrl.selectedWpId"
+                        selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
+            </div>
+            <div class="grid-content medium-1 collapse">
+                <span ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark grid-content collapse" title="Save relation" icon-name="checkmark" icon-title="Save relation">
+                  <span class="hidden-for-sighted ng-binding">Save relation</span>
+                </span>
+            </div>
+            <div class="grid-content medium-1 collapse">
+                <span ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" class="icon-context icon-button icon-remove grid-content collapse" title="Cancel" icon-name="remove" icon-title="Cancel">
+                  <span class="hidden-for-sighted ng-binding">Cancel</span>
+                </span>
+            </div>
         </div>
-        <div class="grid-content medium-7">
-            <wp-relations-autocomplete
-                    selected-wp-id="$relationsCreateCtrl.selectedWpId"
-                    selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
-        </div>
-        <div class="grid-content medium-2">
-             <span style="text-align:right" ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark" title="Save relation" icon-name="checkmark" icon-title="Remove relation">
-                      <span class="hidden-for-sighted ng-binding">Save relation</span>
-                    </span>
-        </div>
-    </div>
+
 </div>
 
 

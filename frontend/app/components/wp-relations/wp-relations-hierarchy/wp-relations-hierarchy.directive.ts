@@ -30,12 +30,11 @@ import {wpTabsModule} from '../../../angular-modules';
 
 interface HierarchyControllerInterface {
   relationGroups:any;
-  getFullIdentifier:any;
   parents:any;
   children:any;
 }
 
-export class WorkPackageRelationsHierarchyController implements HierarchyControllerInterface{
+export class WorkPackageRelationsHierarchyController implements HierarchyControllerInterface {
   public relationGroups;
   public parents;
   public children;
@@ -43,16 +42,6 @@ export class WorkPackageRelationsHierarchyController implements HierarchyControl
   constructor(protected $scope) {
     console.log(this.parents);
   }
-
-  public getFullIdentifier = (workPackage) => {
-    var type = ' ';
-
-    if (workPackage.type) {
-      type += workPackage.type.name + ': ';
-    }
-
-    return `#${workPackage.id}${type}${workPackage.subject}`;
-  };
 }
 
 function wpRelationsDirective() {

@@ -6,10 +6,12 @@ export class WpRelationsCreateController {
   public relationTypes;
   public selectedRelationType;
   public selectedWpId:number;
+  public externalFormToggle: boolean;
   protected relationTitles:Object;
   public workPackage;
 
   constructor(protected $scope,
+              protected $rootScope,
               protected NotificationsService,
               protected wpRelations,
               protected WorkPackageParentRelationGroup,
@@ -29,6 +31,8 @@ export class WpRelationsCreateController {
       follows: I18n.t('js.relation_labels.follows')
     };
 
+    console.log("create form", this);
+
     // Default relationType
     this.selectedRelationType = _.find(this.relationTypes, {name: 'relatedTo'});
   }
@@ -42,29 +46,42 @@ export class WpRelationsCreateController {
 
     this.selectedRelationType.addWpRelation(this.selectedWpId).then((res) => {
       this.toggleRelationsCreateForm();
-      this.NotificationsService.addSuccess('Relation saved');
+      this.wpNotificationsService.showSave(this.workPackage);
     });
   }
 
-  protected addExistingChildWorkPackage(){
+  public createNewChildWorkPackage() {
+    _.find(this.relationTypes, {type: 'children'}).addWpRelation();
+  }
+
+  public toggleFixedRelationTypeForm() {
+    this.externalFormToggle = !this.externalFormToggle;
+  }
+
+  public toggleExistingChildWorkPackageForm() {
+    this.toggleRelationsCreateForm();
+    if(this.showRelationsCreateForm) {
+      this.selectedRelationType = _.find(this.relationTypes, {name: 'children'});
+
+    }
+  }
+
+  protected addExistingChildWorkPackage() {
+    this.toggleExistingChildWorkPackageForm();
     this.wpCacheService.loadWorkPackage(this.selectedWpId).first().subscribe(childWp => {
       childWp.changeParent({
         parentId: this.workPackage.id,
         lockVersion: childWp.lockVersion
-      }).then( (wp) => {
-        this.wpCacheService.updateWorkPackage([wp, childWp]);
-        this.reloadRelations();
+      }).then( (updatedWp) => {
+        this.$rootScope.$emit('workPackagesRefreshInBackground');
+        this.selectedRelationType.handleSuccess([updatedWp, childWp]);
       });
     });
   }
 
-  public toggleRelationsCreateForm(creationMode:string) {
-    if (creationMode === 'createChildWp') {
-      _.find(this.relationTypes, {type: 'children'}).addWpRelation();
-    } else {
-      this.showRelationsCreateForm = !this.showRelationsCreateForm;
-    }
-
+  public toggleRelationsCreateForm() {
+    this.showRelationsCreateForm = !this.showRelationsCreateForm;
+    this.externalFormToggle = !this.externalFormToggle;
   }
 }
 
@@ -72,14 +89,17 @@ function wpRelationsCreate() {
   return {
     restrict: 'E',
     replace: true,
-    templateUrl: '/components/wp-relations/wp-relations-create/wp-relations-create.template.html',
+    templateUrl: (el, attrs) => {
+      return '/components/wp-relations/wp-relations-create/' + attrs.template + '.template.html';
+    },
     controller: WpRelationsCreateController,
     bindToController: true,
     controllerAs: '$relationsCreateCtrl',
     scope: {
       relationTypes: '=',
       workPackage: '=',
-      reloadRelations: '&'
+      fixedRelationType: '@',
+      externalFormToggle: '=?'
     }
   };
 }

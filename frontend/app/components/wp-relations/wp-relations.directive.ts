@@ -88,18 +88,6 @@ export class WorkPackageRelationsController {
       .catch(error => this.wpNotificationsService.handleErrorResponse(error, this.workPackage));
   }
 
-  public canRemoveRelation(relation?):boolean {
-    return this.relationGroup.canRemoveRelation(relation);
-  }
-
-  public removeRelation(relation) {
-    this.relationGroup.removeWpRelation(relation)
-      .then(index => {
-        this.handleSuccess(index);
-      })
-      .catch(error => this.wpNotificationsService.handleErrorResponse(error, this.workPackage));
-  }
-
   public toggleExpand() {
     this.expand = !this.expand;
   }

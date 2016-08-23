@@ -1,35 +1,36 @@
-<div ng-hide="$ctrl.parents.relations.length === 0 && $ctrl.children.relations.length === 0">
+<div>
     <h3>
         Hierarchy
     </h3>
 
-    <div class="grid-block" ng-repeat="parent in $ctrl.parents.relations">
-        <div class="grid-content">
-            <span>
-                <a href="{{parent.$links.activities}}">{{$ctrl.getFullIdentifier(parent)}}</a>
-            </span>
+
+    <div class="grid-block hierarchy-item">
+
+        <div class="grid-content medium-6 collapse">
+            <strong>SUBJECT</strong>
+        </div>
+
+        <div class="grid-content medium-5 collapse">
+            <strong>STATUS</strong>
+        </div>
+
+        <div class="grid-content medium-1 collapse">
         </div>
     </div>
 
-    <div  ng-style="{paddingLeft: $ctrl.parents.isEmpty ? 0 : 20}">
-        <div class="grid-block">
-            <div class="grid-content">
-            <span>
-                    <a href="{{$ctrl.workPackage.$links.activities}}">
-                        <strong>{{$ctrl.getFullIdentifier($ctrl.workPackage)}}</strong>
-                    </a>
-                </span>
-            </div>
-        </div>
-    </div>
 
-    <div ng-style="{paddingLeft: $ctrl.parents.isEmpty ? 20 : 40}">
-        <div class="grid-block" ng-repeat="child in $ctrl.children.relations">
-            <div class="grid-content">
-            <span>
-                <a href="{{child.$links.activities}}">test {{$ctrl.getFullIdentifier(child)}}</a>
-            </span>
-            </div>
-        </div>
-    </div>
+    <wp-relation work-package="$ctrl.workPackage"
+                 relation-group="$ctrl.parents"
+                 relation="relation"
+                 indent-by="0"
+                 ng-repeat="relation in $ctrl.parents.relations"></wp-relation>
+
+    <wp-relation work-package="$ctrl.workPackage"
+                 indent-by="10"></wp-relation>
+
+    <wp-relation work-package="$ctrl.workPackage"
+                 relation-group="$ctrl.children"
+                 relation="relation"
+                 indent-by="20"
+                 ng-repeat="relation in $ctrl.children.relations"></wp-relation>
 </div>

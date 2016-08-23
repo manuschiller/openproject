@@ -57,23 +57,34 @@ export class RelationsPanelController {
       follows: I18n.t('js.relation_buttons.add_follows')
     };
 
-    this.wpCacheService.loadWorkPackage(this.workPackage.id).subscribe(wp => {
-      this.hasRelations = this.checkRelations();
-    });
+    //const wp$ = this.wpCacheService.loadWorkPackage(this.workPackage.id,true);
 
-    this.loadRelations();
-    //wpCacheService.loadWorkPackageLinks(this.workPackage,'relations');
+    this.buildRelationGroups(this.workPackage);
 
+    /*Rx.Observable
+      .combineLatest(
+        wp$.distinctUntilChanged(data => data.relations),
+        wp$.distinctUntilChanged(data => data.parentId),
+        wp$.distinctUntilChanged(data => data.children),
+        updatedWp => updatedWp
+      )
+      .subscribe(updatedWp => {
+        this.buildRelationGroups(updatedWp);
+      });*/
 
   }
 
-  public loadRelations() {
-    this.workPackage.relations.$load().then(() => {
+  public buildRelationGroups(wp) {
+    this.relationGroups.length = 0;
+    angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(wp));
+    this.workPackage.relations.$load().then((relations) => {
+      console.log("loaded relations", relations);
+      wp.relations = relations;
       this.relationGroups.length = 0;
-      angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(this.workPackage));
-      this.hasRelations = this.checkRelations();
+      angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(wp));
+      
     });
-  }
+  };
 
   public getParents() {
     return _.find(this.relationGroups, {type: 'parent'});

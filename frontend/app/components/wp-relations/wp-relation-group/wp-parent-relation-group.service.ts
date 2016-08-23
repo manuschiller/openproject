@@ -37,6 +37,7 @@ var HalResource;
 var PathHelper:any;
 var wpCacheService:WorkPackageCacheService;
 var wpNotificationsService:WorkPackageNotificationService;
+var $rootScope;
 
 export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
   public get canAddRelation():boolean {
@@ -64,6 +65,7 @@ export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
   public removeWpRelation() {
     return this.changeParent(null).then(() => {
       this.relations.pop();
+      this.handleSuccess(this.workPackage)
       return 0;
     });
   }
@@ -76,10 +78,14 @@ export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
 
     return this.workPackage.changeParent(params)
       .then((wp) => {
-        this.workPackage = wp;
-        wpCacheService.loadWorkPackage(parentId,true).first().subscribe(parentWp => {
-          return wpCacheService.updateWorkPackageList([wp, parentWp]);
+        wp.$load().then((updatedWp) => {
+          wpCacheService.loadWorkPackage(parentId, true).first().subscribe(parentWp => {
+            // updates wp list sorting based on parent / child relations
+            this.handleSuccess([this.workPackage, parentWp]);
+            $rootScope.$emit('workPackagesRefreshInBackground');
+          });
         });
+
 
       })
       .catch(error => {
@@ -100,12 +106,12 @@ export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
 }
 
 function wpParentRelationGroupService(...args) {
-  [$q, HalResource, PathHelper, wpCacheService, wpNotificationsService] = args;
+  [$q, HalResource, PathHelper, wpCacheService, wpNotificationsService, $rootScope] = args;
   return WorkPackageParentRelationGroup;
 }
 
 wpParentRelationGroupService.$inject = [
-  '$q', 'HalResource', 'PathHelper', 'wpCacheService', 'wpNotificationsService'
+  '$q', 'HalResource', 'PathHelper', 'wpCacheService', 'wpNotificationsService', '$rootScope'
 ];
 
 wpTabsModule.factory('WorkPackageParentRelationGroup', wpParentRelationGroupService);

@@ -36,6 +36,7 @@ var $q:ng.IQService;
 var $http:ng.IHttpService;
 var PathHelper:any;
 var wpCacheService;
+var wpNotificationsService;
 
 export class WorkPackageRelationGroup {
   public relations = [];
@@ -106,7 +107,10 @@ export class WorkPackageRelationGroup {
       to_id: wpId,
       relation_type: this.id
     })
-      .then(relation => this.relations.push(relation));
+      .then((relation) => {
+        this.relations.push(relation);
+        this.handleSuccess([this.workPackage]);
+      });
   }
 
   public removeWpRelation(relation) {
@@ -114,8 +118,14 @@ export class WorkPackageRelationGroup {
 
     return relation.remove().then(() => {
       this.relations.splice(index, 1);
+      this.handleSuccess(this);
       return index;
     });
+  }
+
+  public handleSuccess(workPackages) {
+    wpCacheService.updateWorkPackageList(workPackages);
+    wpNotificationsService.showSave(this.workPackage);
   }
 
   protected init() {
@@ -128,10 +138,10 @@ export class WorkPackageRelationGroup {
 }
 
 function wpRelationGroupService(...args) {
-  [$q, $http, PathHelper, wpCacheService] = args;
+  [$q, $http, PathHelper, wpCacheService, wpNotificationsService] = args;
   return WorkPackageRelationGroup;
 }
 
-wpRelationGroupService.$inject = ['$q', '$http', 'PathHelper', 'wpCacheService'];
+wpRelationGroupService.$inject = ['$q', '$http', 'PathHelper', 'wpCacheService', 'wpNotificationsService'];
 
 wpTabsModule.factory('WorkPackageRelationGroup', wpRelationGroupService);

@@ -1,42 +1,35 @@
-<div>
-    <div class="grid-block v-align hierarchy-item">
-        <div class="grid-content medium-6 collapse">
-            <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
-                <a href="{{$ctrl.relation.$links.activities}}">{{$ctrl.relation.fullIdentifier}}</a>
-            </span>
+<div ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
+    <div class="grid-block hierarchy-item">
+
+        <div class="grid-content medium-2 collapse">
+            {{$ctrl.relationType}}
         </div>
-        <div class="grid-content medium-4 collapse" style="margin-left:2px;">
-            <div wp-edit-form="$ctrl.relatedWorkPackage" ng-if="$ctrl.relatedWorkPackage">
-                <div wp-edit-field="'status'"
-                        wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
-                </div>
-            </div>
+
+        <div class="grid-content medium-5 collapse">
+            <a href="$ctrl.relatedWorkPackage.$links.activities">
+                #{{$ctrl.relatedWorkPackage.id}} {{ $ctrl.relatedWorkPackage.subject }}
+            </a>
         </div>
-        <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard execute="$ctrl.toggleEditForm()">
-                <icon-wrapper icon-name="edit"
-                              icon-title="'foo'">
+
+        <div class="grid-content medium-3 collapse">{{$ctrl.relatedWorkPackage.status.name}}</div>
+        <!--<div class="grid-content medium-3 collapse" wp-edit-form="$ctrl.relatedWorkPackage">
+            <div wp-edit-field="'status'"></div>
+        </div>-->
+
+        <div class="grid-content medium-2 collapse" style="text-align:right;">
+            <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
+                    execute="$ctrl.removeRelation($ctrl.relation)">
+                <icon-wrapper icon-name="info1"
+                              icon-title="'Info for related workpackage'">
                 </icon-wrapper>
             </accessible-by-keyboard>
-        </div>
-        <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard
-                                    execute="$ctrl.removeRelation($ctrl.relation)">
-                <icon-wrapper icon-name="info"
-                              icon-title="'foo'">
+
+            <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
+                    execute="$ctrl.removeRelation($ctrl.relation)">
+                <icon-wrapper icon-name="remove"
+                              icon-title="'remove relation'">
                 </icon-wrapper>
             </accessible-by-keyboard>
         </div>
     </div>
-
-    <div class="grid-block hierarchy-item" ng-if="$ctrl.showEditForm">
-        <div class="grid-content medium-12 collapse">
-            <wp-relations-create
-                    work-package="$ctrl.workPackage"
-                    template="add-fixed-type"
-                    fixed-relation-type="parent"
-                    external-form-toggle="$ctrl.showEditForm"></wp-relations-create>
-        </div>
-    </div>
-
 </div>

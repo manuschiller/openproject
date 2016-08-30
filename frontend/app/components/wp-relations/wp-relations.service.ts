@@ -40,9 +40,6 @@ export class WorkPackageRelationsService {
   }
 
   public getWpRelationGroup(baseWorkPackage:WorkPackageResourceInterface, relatedWorkPackages, relations) {
-    console.log('wp', baseWorkPackage);
-    console.log('relatedWps', relatedWorkPackages);
-    console.log('relations', relations);
 
     var relationsObj = {
       relation: []
@@ -58,8 +55,6 @@ export class WorkPackageRelationsService {
         isChild: false
       });
     });
-
-    console.log("relations obj", relationsObj);
   };
 
   public relation(workPackage, relation) {

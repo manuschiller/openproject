@@ -1,0 +1,42 @@
+<div>
+    <div class="grid-block v-align hierarchy-item">
+        <div class="grid-content medium-6 collapse">
+            <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
+                <a href="{{$ctrl.workPackage.$links.activities}}">{{$ctrl.getFullIdentifier()}}</a>
+            </span>
+        </div>
+        <div class="grid-content medium-4 collapse" style="margin-left:2px;">
+            {{$ctrl.workPackage.status.name}}
+            <!--<div wp-edit-form="$ctrl.workPackage" ng-if="$ctrl.workPackage">
+                <div wp-edit-field="'status'"
+                        wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
+                </div>
+            </div>-->
+        </div>
+        <div class="grid-content medium-1 collapse">
+            <accessible-by-keyboard execute="$ctrl.toggleEditForm()" ng-if="$ctrl.relationType == 'parent'"
+                <icon-wrapper icon-name="edit"
+                              icon-title="'foo'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+        </div>
+        <div class="grid-content medium-1 collapse">
+            <accessible-by-keyboard ng-if="$ctrl.relationType"
+                                    execute="$ctrl.removeRelation()">
+                <icon-wrapper icon-name="remove"
+                              icon-title="'foo'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+        </div>
+    </div>
+
+    <div class="grid-block hierarchy-item" ng-if="$ctrl.showEditForm">
+        <div class="grid-content medium-12 collapse">
+            <wp-relations-create
+                    work-package="$ctrl.workPackage"
+                    template="add-fixed-type"
+                    fixed-relation-type="parent"
+                    external-form-toggle="$ctrl.showEditForm"></wp-relations-create>
+        </div>
+    </div>
+</div>

@@ -28,24 +28,36 @@
 
 import {wpTabsModule} from '../../../angular-modules';
 
-export class WorkPackageRelationsHierarchyController{
+export class WorkPackageRelationsHierarchyController {
   public relationTypes;
-  public parents = [];
-  public children;
+  public parent;
+  public children = [];
   public workPackage;
 
-  constructor(protected $scope) {
-    console.log(this.workPackage);
+  constructor(protected $q) {
     if (this.workPackage.parentId) {
-      this.workPackage.parent.$load().then(parent => {
-        this.parents.push(parent);
+      this.workPackage.parent.$load(true).then(parent => {
+        this.parent = parent;
       });
     }
+    var relatedChildrenPromises = [];
+    this.workPackage.children.forEach(child => {
+      relatedChildrenPromises.push(child.$load());
+    });
+    $q.all(relatedChildrenPromises).then(children => {
+      this.children = children;
+    });
 
-    this.children = this.workPackage.children;
-    console.log("parent", this.parents);
-    console.log("base wp", this.workPackage);
-    console.log("children", this.children);
+  }
+
+  public removeParentRelation() {
+    this.workPackage.changeParent(null).then(res => console.log(res));
+  }
+
+  public removeRelation() {
+    this.workPackage.relatedBy.remove().then(res => {
+      console.log("successfully removed", res);
+    })
   }
 }
 
@@ -56,7 +68,8 @@ function wpRelationsDirective() {
     templateUrl: '/components/wp-relations/wp-relations-hierarchy/wp-relations-hierarchy.template.html',
 
     scope: {
-      workPackage: '='
+      workPackage: '=',
+      relationType: '@'
     },
 
     controller: WorkPackageRelationsHierarchyController,

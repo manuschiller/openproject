@@ -18,46 +18,13 @@
         </div>
     </div>
 
-    <div ng-if="$ctrl.parents">
-        <div class="grid-block hierarchy-item">
-
-            <div class="grid-content medium-2 collapse">
-                blocks
-            </div>
-
-            <div class="grid-content medium-6 collapse">
-                <a href="$ctrl.parents[0].$links.activities">
-                    #{{$ctrl.parents[0].id}} {{ $ctrl.parents[0].subject }}
-                </a>
-            </div>
-
-            <div class="grid-content medium-3 collapse" wp-edit-form="$ctrl.parents[0]">
-                <div wp-edit-field="'status'"></div>
-            </div>
-
-            <div class="grid-content medium-1 collapse">
-                <accessible-by-keyboard
-                        execute="$ctrl.removeRelation($ctrl.relation)">
-                    <icon-wrapper icon-name="remove"
-                                  icon-title="'foo'">
-                    </icon-wrapper>
-                </accessible-by-keyboard>
-            </div>
-        </div>
+    <div ng-if="$ctrl.parent">
+        <wp-relations-hierarchy-row work-package="$ctrl.parent" relation-type="parent"></wp-relations-hierarchy-row>
     </div>
-    <wp-relation work-package="$ctrl.workPackage"
-                 relation-group="$ctrl.parents"
-                 relation="relation"
-                 indent-by="0"
-                 ng-repeat="relation in $ctrl.parents.relations"
-                 ng-if="!$ctrl.parents.isEmpty"></wp-relation>
 
-    <wp-relation work-package="$ctrl.workPackage"
-                 indent-by="10"></wp-relation>
+    <wp-relations-hierarchy-row work-package="$ctrl.workPackage"></wp-relations-hierarchy-row>
+    <wp-relations-hierarchy-row work-package="relatedWorkPackage" indent-by="20" relation-type="child" ng-repeat="relatedWorkPackage in $ctrl.children"></wp-relations-hierarchy-row>
 
-    <wp-relation work-package="$ctrl.workPackage"
-                 relation-group="$ctrl.children"
-                 relation="relation"
-                 indent-by="20"
-                 ng-repeat="relation in $ctrl.children.relations"></wp-relation>
+
+    <wp-relations-create work-package="workPackage" template="add-child"></wp-relations-create>
 </div>

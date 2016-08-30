@@ -28,12 +28,25 @@
 
 import {wpTabsModule} from '../../angular-modules';
 import {WorkPackageNotificationService} from '../wp-edit/wp-notification.service';
-import {WorkPackageResource} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {
+  WorkPackageResource,
+  WorkPackageResourceInterface
+} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {HalResource} from "../api/api-v3/hal-resources/hal-resource.service";
 
+interface RelatedWorkPackage extends WorkPackageResourceInterface {
+  relatedBy: HalResource;
+}
 
 export class WorkPackageRelationsController {
   public workPackage;
   public relationGroups;
+
+  private relationsCache = {
+    relations: [],
+    parentId: 0,
+    children: []
+  };
 
   constructor(protected $scope,
               protected $q,
@@ -42,45 +55,45 @@ export class WorkPackageRelationsController {
               protected wpCacheService,
               protected wpNotificationsService:WorkPackageNotificationService,
               protected NotificationsService) {
-    this.loadRelations();
+    wpCacheService.loadWorkPackage(this.workPackage.id, true).subscribe(wp => {
+      console.log("wp relations changed",wp);
+
+        this.workPackage.$load(true).then(wp => {
+          this.workPackage = wp;
+          this.loadRelations();
+        });
+
+    });
   }
 
   protected loadRelations() {
     var relatedWpPromises = [];
-    var relatedWpSubscribes = [];
+    var wpRelations = [];
 
-    var relatedIds = [];
-
-    if (this.workPackage.parent) {
-      relatedWpPromises.push(this.workPackage.parent.$load());
-      relatedIds.push(this.workPackage.parentId);
-    }
-
-    this.workPackage.relations.$load().then(relations => {
+    this.workPackage.relations.$load(true).then(relations => {
       relations.$embedded.elements.forEach(relation => {
         if (relation.relatedTo.href === this.workPackage.href) {
-          relatedWpPromises.push(relation.relatedFrom.href.$load(true));
+          relatedWpPromises.push(relation.relatedFrom.$load(true));
+          wpRelations[relation.relatedFrom.href.split('/').pop()] = relation;
         }
-        relatedWpPromises.push(relation.relatedFrom.$load(true));
+        relatedWpPromises.push(relation.relatedTo.$load(true));
+        wpRelations[relation.relatedTo.href.split('/').pop()] = relation;
       });
 
-
       this.$q.all(relatedWpPromises).then(relatedWorkPackages => {
-        if (angular.isArray(this.workPackage.children)) {
-          relatedWorkPackages.push(...this.workPackage.children);
-        }
-
         var loadWps = [];
         relatedWorkPackages.forEach(wp => {
           loadWps.push(wp.$load());
         });
 
         this.$q.all(loadWps).then(wps => {
-          this.relationGroups = (_.groupBy(relatedWorkPackages, (wp) => { return wp.type.name; }) as Array);
+          wps.forEach(wp => {
+            (wp as RelatedWorkPackage).relatedBy = wpRelations[wp.id];
+          });
+          this.relationGroups.length = 0;
+          angular.extend(this.relationGroups, _.groupBy(relatedWorkPackages, (wp) => { return wp.type.name; }) as Array);
           console.log("relation groups", this.relationGroups);
-          this.WpRelationsService.getWpRelationGroup(this.workPackage, relatedWorkPackages, relations);
         });
-
 
       });
     });

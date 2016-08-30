@@ -44,7 +44,7 @@ export class RelationsPanelController {
               protected $scope,
               protected $q,
               protected wpCacheService,
-              protected wpRelations:WorkPackageRelationsService) {
+              protected wpRelationsService:WorkPackageRelationsService) {
 
     this.relationTitles = {
       parent: I18n.t('js.relation_buttons.change_parent'),

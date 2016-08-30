@@ -27,91 +27,63 @@
 //++
 
 import {wpTabsModule} from '../../angular-modules';
-import {WorkPackageRelationGroup} from './wp-relation-group/wp-relation-group.service';
 import {WorkPackageNotificationService} from '../wp-edit/wp-notification.service';
 import {WorkPackageResource} from '../api/api-v3/hal-resources/work-package-resource.service';
 
-const iconArrowClasses = ['icon-arrow-up1', 'icon-arrow-down1'];
 
 export class WorkPackageRelationsController {
-  public btnTitle:string;
-  public btnIcon:string = '<i class="icon-hierarchy icon-add"></i>';
-
-  public workPackage:WorkPackageResource;
-  public relationGroup:WorkPackageRelationGroup;
-  public focusElementIndex:number = -2;
-  public wpToAddId:number = null;
-  public expand:boolean = false;
-  public text:any;
-
-  private _initialExpand:boolean;
-
-  public get stateClass():string {
-    return iconArrowClasses[+!!this.expand];
-  }
-
-  public get groupExpanded() {
-    if (angular.isUndefined(this._initialExpand) && !this.relationGroup.isEmpty) {
-      this._initialExpand = this.expand = !this.relationGroup.isEmpty;
-    }
-    return this.expand;
-  }
+  public workPackage;
+  public relationGroups;
 
   constructor(protected $scope,
+              protected $q,
               protected I18n,
+              protected WpRelationsService,
+              protected wpCacheService,
               protected wpNotificationsService:WorkPackageNotificationService,
               protected NotificationsService) {
-    this.text = {
-      title: I18n.t('js.relation_labels.' + this.relationGroup.id),
-      table: {
-        subject: I18n.t('js.work_packages.properties.subject'),
-        status: I18n.t('js.work_packages.properties.status'),
-        assignee: I18n.t('js.work_packages.properties.assignee')
-      },
-      relations: {
-        empty: I18n.t('js.relations.empty'),
-        remove: I18n.t('js.relations.remove')
-      }
-    };
-
-    if (this.relationGroup.id === 'parent') {
-      this.btnIcon = '<i class="icon-hierarchy icon-edit"></i>';
-    }
+    this.loadRelations();
   }
 
-  public addRelation() {
-    this.relationGroup.addWpRelation(this.wpToAddId)
-      .then(() => {
-        this.wpToAddId = null;
-        this.handleSuccess(-1);
-      })
-      .catch(error => this.wpNotificationsService.handleErrorResponse(error, this.workPackage));
-  }
+  protected loadRelations() {
+    var relatedWpPromises = [];
+    var relatedWpSubscribes = [];
 
-  public toggleExpand() {
-    this.expand = !this.expand;
-  }
+    var relatedIds = [];
 
-  public isFocused(index:number) {
-    return index === this.focusElementIndex;
-  }
-
-  public updateFocus(index:number) {
-    var length = this.relationGroup.relations.length;
-
-    if (length == 0) {
-      this.focusElementIndex = -1;
-    }
-    else {
-      this.focusElementIndex = (index < length) ? index : length - 1;
+    if (this.workPackage.parent) {
+      relatedWpPromises.push(this.workPackage.parent.$load());
+      relatedIds.push(this.workPackage.parentId);
     }
 
-    this.$scope.$evalAsync(() => this.$scope.$broadcast('updateFocus'));
-  }
+    this.workPackage.relations.$load().then(relations => {
+      relations.$embedded.elements.forEach(relation => {
+        if (relation.relatedTo.href === this.workPackage.href) {
+          relatedWpPromises.push(relation.relatedFrom.href.$load(true));
+        }
+        relatedWpPromises.push(relation.relatedFrom.$load(true));
+      });
 
-  private handleSuccess(index) {
-    this.updateFocus(index);
-    this.$scope.$emit('workPackagesRefreshInBackground');
+
+      this.$q.all(relatedWpPromises).then(relatedWorkPackages => {
+        if (angular.isArray(this.workPackage.children)) {
+          relatedWorkPackages.push(...this.workPackage.children);
+        }
+
+        var loadWps = [];
+        relatedWorkPackages.forEach(wp => {
+          loadWps.push(wp.$load());
+        });
+
+        this.$q.all(loadWps).then(wps => {
+          this.relationGroups = (_.groupBy(relatedWorkPackages, (wp) => { return wp.type.name; }) as Array);
+          console.log("relation groups", this.relationGroups);
+          this.WpRelationsService.getWpRelationGroup(this.workPackage, relatedWorkPackages, relations);
+        });
+
+
+      });
+    });
   }
 }
 
@@ -119,12 +91,10 @@ function wpRelationsDirective() {
   return {
     restrict: 'E',
     replace: true,
-    templateUrl: '/components/wp-relations/wp-relations.directive.html',
+    templateUrl: '/components/wp-relations/wp-relations.template.html',
 
     scope: {
-      relationGroup: '=',
-      workPackage: '=',
-      btnTitle: '=buttonTitle',
+      workPackage: '='
     },
 
     controller: WorkPackageRelationsController,

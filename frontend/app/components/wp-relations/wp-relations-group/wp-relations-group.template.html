@@ -1,0 +1,45 @@
+<div style="margin-top:1.5em;">
+    <div class="attributes-group--header">
+        <div class="attributes-group--header-container">
+            <h3 class="attributes-group--header-text">
+                {{$ctrl.wpType}}s
+            </h3>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="grid-block hierarchy-item" ng-repeat="relatedWorkPackage in $ctrl.relatedWorkPackages">
+
+            <div class="grid-content medium-2 collapse">
+                Blocks
+            </div>
+
+            <div class="grid-content medium-5 collapse">
+                <a href="relatedWorkPackage.$links.activities">
+                    #{{relatedWorkPackage.id}} {{ relatedWorkPackage.subject }}
+                </a>
+            </div>
+
+            <div class="grid-content medium-3 collapse" wp-edit-form="relatedWorkPackage">
+                <div wp-edit-field="'status'"></div>
+            </div>
+
+            <div class="grid-content medium-2 collapse" style="text-align:right;">
+                <accessible-by-keyboard
+                        execute="$ctrl.removeRelation($ctrl.relation)">
+                    <icon-wrapper icon-name="info1"
+                                  icon-title="'foo'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+
+                <accessible-by-keyboard
+                        execute="$ctrl.removeRelation($ctrl.relation)">
+                    <icon-wrapper icon-name="remove"
+                                  icon-title="'foo'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -108,7 +108,7 @@ export class WorkPackageRelationGroup {
       relation_type: this.id
     })
       .then((relation) => {
-        this.relations.push(relation);
+        //this.relations.push(relation);
         this.handleSuccess([this.workPackage]);
       });
   }
@@ -117,15 +117,18 @@ export class WorkPackageRelationGroup {
     const index = this.relations.indexOf(relation);
 
     return relation.remove().then(() => {
-      this.relations.splice(index, 1);
-      this.handleSuccess(this);
+      //this.relations.splice(index, 1);
+      this.handleSuccess([this.workPackage]);
       return index;
     });
   }
 
   public handleSuccess(workPackages) {
-    wpCacheService.updateWorkPackageList(workPackages);
-    wpNotificationsService.showSave(this.workPackage);
+    this.workPackage.save().then(() => {
+      //wpCacheService.updateWorkPackage(this.workPackage);
+      wpCacheService.updateWorkPackageList(workPackages);
+      wpNotificationsService.showSave(this.workPackage);
+    });
   }
 
   protected init() {

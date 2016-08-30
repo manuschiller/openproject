@@ -81,8 +81,8 @@ export class WorkPackageParentRelationGroup extends WorkPackageRelationGroup {
         wp.$load().then((updatedWp) => {
           wpCacheService.loadWorkPackage(parentId, true).first().subscribe(parentWp => {
             // updates wp list sorting based on parent / child relations
-            this.handleSuccess([this.workPackage, parentWp]);
-            $rootScope.$emit('workPackagesRefreshInBackground');
+            //this.handleSuccess([this.workPackage, parentWp]);
+            //$rootScope.$emit('workPackagesRefreshInBackground');
           });
         });
 

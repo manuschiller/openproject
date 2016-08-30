@@ -26,29 +26,11 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-.detail-panel-description-content
-  .relation
-    h3
-      cursor: pointer
-      a
-        text-decoration: none
-        color: inherit
-      i
-        font-size: 0.8rem
+import {wpTabsModule} from '../../../angular-modules';
 
-.add-relation
-  .select2
-    width: 350px
-  .select2-drop
-    width: 350px
-    top: auto
-    input[type='text']
-      width: 100%
 
-.tab-content--padding-right
-  padding-right: 25px
-
-.hierarchy-item
-  margin-bottom: 2px
+export class WorkPackageChildRelation {
+  
+}
 
 

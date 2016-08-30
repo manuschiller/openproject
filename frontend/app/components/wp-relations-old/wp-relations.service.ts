@@ -36,46 +36,42 @@ export interface WorkPackageRelationsConfigInterface {
 }
 
 export class WorkPackageRelationsService {
-  constructor(protected $q) {
+  private relationsConfig:WorkPackageRelationsConfigInterface[] = [
+    {name: 'parent', type: 'parent'},
+    {name: 'children', type: 'children'},
+    {name: 'relatedTo', type: 'Relation::Relates', id: 'relates'},
+    {name: 'duplicates', type: 'Relation::Duplicates'},
+    {name: 'duplicated', type: 'Relation::Duplicated'},
+    {name: 'blocks', type: 'Relation::Blocks'},
+    {name: 'blocked', type: 'Relation::Blocked'},
+    {name: 'precedes', type: 'Relation::Precedes'},
+    {name: 'follows', type: 'Relation::Follows'}
+  ];
+
+  constructor(protected WorkPackageRelationGroup,
+              protected WorkPackageParentRelationGroup,
+              protected WorkPackageChildRelationsGroup,
+              protected $q) {
   }
 
-  public getWpRelationGroup(baseWorkPackage:WorkPackageResourceInterface, relatedWorkPackages, relations) {
-    console.log('wp', baseWorkPackage);
-    console.log('relatedWps', relatedWorkPackages);
-    console.log('relations', relations);
+  public getWpRelationGroups(workPackage:WorkPackageResourceInterface) {
+    let configsOfInterest = this.relationsConfig;
 
-    var relationsObj = {
-      relation: []
-    };
-
-    relations.elements.forEach(relation => {
-      relationsObj.relation.push({
-        relation: relation,
-        relatedWp: _.find(relatedWorkPackages, (wp) => {
-          return wp.id === this.getRelatedWpId(relation, baseWorkPackage);
-        }),
-        isParent: false,
-        isChild: false
-      });
-    });
-
-    console.log("relations obj", relationsObj);
-  };
-
-  public relation(workPackage, relation) {
-
-  }
-
-  protected isParent(workPackage, relatedWorkPackage){
-    return (workPackage.parentId === relatedWorkPackage.id);
-  }
-
-  protected getRelatedWpId(relation, wp) {
-    if (relation.relatedTo.href === wp.href) {
-      return relation.relatedFrom.id;
+    if (workPackage.isMilestone) {
+      configsOfInterest = _.reject(configsOfInterest, {name: 'children'});
     }
-    return relation.relatedTo.id;
+
+    return configsOfInterest.map(config => {
+      switch (config.type) {
+        case 'parent':
+          return new this.WorkPackageParentRelationGroup(workPackage, config);
+        case 'children':
+          return new this.WorkPackageChildRelationsGroup(workPackage, config);
+        default:
+          return new this.WorkPackageRelationGroup(workPackage, config);
+      }
+    });
   }
 }
 
-wpTabsModule.service('WpRelationsService', WorkPackageRelationsService);
+wpTabsModule.service('wpRelationsOld', WorkPackageRelationsService);

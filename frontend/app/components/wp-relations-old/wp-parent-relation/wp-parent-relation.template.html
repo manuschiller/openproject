@@ -1,0 +1,27 @@
+<div>
+    <wp-relations-create
+            template="empty-parents"
+            work-package="$ctrl.workPackage"
+            fixed-relation-type="parent">
+    </wp-relations-create>
+
+    <wp-relation
+            work-package="$ctrl.workPackage"
+            relation="$ctrl.relation"
+            relation-group="$ctrl.relationGroup"
+            edit-toggle="$ctrl.showEditForm"
+            ng-if="$ctrl.relation">
+    </wp-relation>
+
+    <div class="grid-block hierarchy-item" ng-if="$ctrl.showEditForm">
+        <div class="grid-content medium-12 collapse">
+            <wp-relations-create
+                    work-package="$ctrl.workPackage"
+                    template="add-fixed-type"
+                    fixed-relation-type="parent"
+                    edit-toggle="$ctrl.showEditForm"></wp-relations-create>
+        </div>
+    </div>
+
+
+</div>

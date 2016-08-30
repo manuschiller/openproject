@@ -1,11 +1,11 @@
 <div>
-    <div class="grid-block hierarchy-item" ng-if="!$ctrl.showEditParentForm">
+    <div class="grid-block v-align hierarchy-item">
         <div class="grid-content medium-6 collapse">
             <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
-                <a href="{{$ctrl.relation.$links.activities}}">{{$ctrl.fullIdentifier}}</a>
+                <a href="{{$ctrl.relation.$links.activities}}">{{$ctrl.relation.fullIdentifier}}</a>
             </span>
         </div>
-        <div class="grid-content medium-4 collapse">
+        <div class="grid-content medium-4 collapse" style="margin-left:2px;">
             <div wp-edit-form="$ctrl.relatedWorkPackage" ng-if="$ctrl.relatedWorkPackage">
                 <div wp-edit-field="'status'"
                         wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
@@ -13,16 +13,16 @@
             </div>
         </div>
         <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard execute="$ctrl.toggleEditParentForm()" ng-if="$ctrl.relationGroup.name == 'parent'">
+            <accessible-by-keyboard execute="$ctrl.toggleEditForm()">
                 <icon-wrapper icon-name="edit"
                               icon-title="'foo'">
                 </icon-wrapper>
             </accessible-by-keyboard>
         </div>
         <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard ng-if="$ctrl.relationGroup && $ctrl.relation"
+            <accessible-by-keyboard
                                     execute="$ctrl.removeRelation($ctrl.relation)">
-                <icon-wrapper icon-name="remove"
+                <icon-wrapper icon-name="info"
                               icon-title="'foo'">
                 </icon-wrapper>
             </accessible-by-keyboard>

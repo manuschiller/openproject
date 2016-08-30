@@ -28,19 +28,24 @@
 
 import {wpTabsModule} from '../../../angular-modules';
 
-interface HierarchyControllerInterface {
-  relationGroups:any;
-  parents:any;
-  children:any;
-}
-
-export class WorkPackageRelationsHierarchyController implements HierarchyControllerInterface {
-  public relationGroups;
-  public parents;
+export class WorkPackageRelationsHierarchyController{
+  public relationTypes;
+  public parents = [];
   public children;
+  public workPackage;
 
   constructor(protected $scope) {
-    console.log(this.parents);
+    console.log(this.workPackage);
+    if (this.workPackage.parentId) {
+      this.workPackage.parent.$load().then(parent => {
+        this.parents.push(parent);
+      });
+    }
+
+    this.children = this.workPackage.children;
+    console.log("parent", this.parents);
+    console.log("base wp", this.workPackage);
+    console.log("children", this.children);
   }
 }
 
@@ -51,8 +56,6 @@ function wpRelationsDirective() {
     templateUrl: '/components/wp-relations/wp-relations-hierarchy/wp-relations-hierarchy.template.html',
 
     scope: {
-      parents: '=',
-      children: '=',
       workPackage: '='
     },
 

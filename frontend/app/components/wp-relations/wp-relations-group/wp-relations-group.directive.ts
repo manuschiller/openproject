@@ -26,29 +26,37 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-.detail-panel-description-content
-  .relation
-    h3
-      cursor: pointer
-      a
-        text-decoration: none
-        color: inherit
-      i
-        font-size: 0.8rem
-
-.add-relation
-  .select2
-    width: 350px
-  .select2-drop
-    width: 350px
-    top: auto
-    input[type='text']
-      width: 100%
-
-.tab-content--padding-right
-  padding-right: 25px
-
-.hierarchy-item
-  margin-bottom: 2px
+import {wpTabsModule} from '../../../angular-modules';
 
 
+export class WorkPackageRelationsGroupController {
+  public workPackage;
+  public wpType;
+  public relatedWorkPackages;
+
+  constructor(protected $scope,
+              protected $q,
+              protected I18n,
+              protected NotificationsService) {
+  }
+}
+
+function wpRelationsDirective() {
+  return {
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/components/wp-relations/wp-relations-group/wp-relations-group.template.html',
+
+    scope: {
+      wpType: '=',
+      workPackage: '=',
+      relatedWorkPackages: '='
+    },
+
+    controller: WorkPackageRelationsGroupController,
+    controllerAs: '$ctrl',
+    bindToController: true,
+  };
+}
+
+wpTabsModule.directive('wpRelationsGroup', wpRelationsDirective);

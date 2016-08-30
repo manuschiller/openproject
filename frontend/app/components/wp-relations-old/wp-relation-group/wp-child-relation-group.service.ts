@@ -47,10 +47,8 @@ export class WorkPackageChildRelationsGroup extends WorkPackageRelationGroup {
   }
 
   public addWpRelation():ng.IPromise<any> {
-    console.log("create new child wp", this.workPackage);
     return this.workPackage.project.$load()
       .then(() => {
-        console.log("project loaded");
         const args = [
           'work-packages.list.new',
           {
@@ -79,7 +77,7 @@ export class WorkPackageChildRelationsGroup extends WorkPackageRelationGroup {
           .then(() => {
             this.relations.splice(index, 1);
             deferred.resolve(index);
-            this.handleSuccess([this.workPackage]);
+            //this.handleSuccess([this.workPackage, workPackage]);
           })
           .catch(deferred.reject);
       })

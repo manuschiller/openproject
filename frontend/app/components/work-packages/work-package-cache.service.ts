@@ -54,18 +54,15 @@ export class WorkPackageCacheService {
   }
 
   updateWorkPackageList(list: WorkPackageResource[]) {
-    console.log("updating wp list", list);
-    if (angular.isArray(list)) {
-      for (const wp of list) {
-        var cached = this.workPackageCache[wp.id];
-        if (cached && cached.dirty) {
-          this.workPackageCache[wp.id] = cached;
-        } else {
-          this.workPackageCache[wp.id] = wp;
-        }
+    for (const wp of list) {
+      var cached = this.workPackageCache[wp.id];
+      if (cached && cached.dirty) {
+        this.workPackageCache[wp.id] = cached;
+      } else {
+        this.workPackageCache[wp.id] = wp;
       }
-      this.workPackagesSubject.onNext(this.workPackageCache);
     }
+    this.workPackagesSubject.onNext(this.workPackageCache);
   }
 
   /**

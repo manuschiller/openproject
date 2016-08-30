@@ -38,10 +38,11 @@ export class RelationsPanelController {
   public workPackage:WorkPackageResourceInterface;
   public relationTitles;
   public relationGroups = [];
-  public hasRelations: boolean;
+  public hasRelations:boolean;
 
-  constructor(I18n: op.I18n,
+  constructor(protected I18n:op.I18n,
               protected $scope,
+              protected $q,
               protected wpCacheService,
               protected wpRelations:WorkPackageRelationsService) {
 
@@ -57,10 +58,36 @@ export class RelationsPanelController {
       follows: I18n.t('js.relation_buttons.add_follows')
     };
 
-    //const wp$ = this.wpCacheService.loadWorkPackage(this.workPackage.id,true);
+    //this.buildRelationGroups(this.workPackage);
 
-    this.buildRelationGroups(this.workPackage);
+    var promiseChain = [];
 
+
+    if (this.workPackage.parent) {
+      console.log('has parent');
+      promiseChain.push(this.workPackage.parent.$load());
+    }
+
+    this.workPackage.relations.$load().then(relations => {
+      relations.$embedded.elements.forEach(relation => {
+        if (relation.relatedTo.href === this.workPackage.href) {
+          promiseChain.push(relation.relatedFrom.$load());
+        }
+        promiseChain.push(relation.relatedTo.$load());
+      });
+      $q.all(promiseChain).then(res => {
+        if (angular.isArray(this.workPackage.children)) {
+          res.push(...this.workPackage.children);
+        }
+
+        this.relationGroups = (_.groupBy(res, (wp) => { return wp.type.name; }) as Array);
+          console.log(this.relationGroups);
+        });
+    });
+
+
+      /*
+    });
     /*Rx.Observable
       .combineLatest(
         wp$.distinctUntilChanged(data => data.relations),
@@ -69,22 +96,16 @@ export class RelationsPanelController {
         updatedWp => updatedWp
       )
       .subscribe(updatedWp => {
-        this.buildRelationGroups(updatedWp);
-      });*/
 
+        });*/
+        //this.buildRelationGroups(updatedWp);
   }
 
   public buildRelationGroups(wp) {
     this.relationGroups.length = 0;
-    angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(wp));
-    this.workPackage.relations.$load().then((relations) => {
-      console.log("loaded relations", relations);
-      wp.relations = relations;
-      this.relationGroups.length = 0;
-      angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(wp));
-      
-    });
-  };
+    angular.extend(this.relationGroups, this.wpRelations.getWpRelationGroups(this.workPackage));
+    //console.log("relation groups", this.relationGroups);
+  }
 
   public getParents() {
     return _.find(this.relationGroups, {type: 'parent'});

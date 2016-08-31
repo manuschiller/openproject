@@ -28,13 +28,14 @@
 
 import {wpTabsModule} from '../../../../angular-modules';
 
-function wpRelationsAutocompleteDirective(I18n) {
+function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
   return {
     restrict: 'E',
     templateUrl: '/components/wp-relations/wp-relations-create/wp-relations-autocomplete/wp-relations-autocomplete.template.html',
     scope: {
       selectedWpId: '=',
-      selectedRelationType: '='
+      selectedRelationType: '=',
+      workPackage: '='
     },
     link: function (scope) {
       scope.onSelect = function(wpId){
@@ -46,10 +47,36 @@ function wpRelationsAutocompleteDirective(I18n) {
           return;
         }
 
-        scope.selectedRelationType.findRelatableWorkPackages(term).then(workPackages => {
+        findRelatableWorkPackages(term).then(workPackages => {
+          // TODO: filter self and already related wps
           scope.options = workPackages;
         });
       };
+
+      function findRelatableWorkPackages(search:string) {
+        const deferred = $q.defer();
+        var params;
+
+        scope.workPackage.project.$load().then(() => {
+          params = {
+            q: search,
+            scope: 'relatable',
+            escape: false,
+            id: scope.workPackage.id,
+            project_id: scope.workPackage.project.id
+          };
+
+          $http({
+            method: 'GET',
+            url: URI(PathHelper.workPackageJsonAutoCompletePath()).search(params).toString()
+          })
+            .then((response:any) => deferred.resolve(response.data))
+            .catch(deferred.reject);
+        })
+          .catch(deferred.reject);
+
+        return deferred.promise;
+      }
     }
   };
 }

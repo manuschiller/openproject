@@ -1,72 +1,40 @@
 import {wpTabsModule} from '../../../angular-modules';
+import {WorkPackageResourceInterface} from '../../api/api-v3/hal-resources/work-package-resource.service';
 
 export class WpRelationsCreateController {
 
   public showRelationsCreateForm: boolean = false;
-  public relationTypes;
-  public selectedRelationType;
-  public selectedWpId:number;
+  public workPackage:WorkPackageResourceInterface;
+  public selectedRelationType:any;
+  public selectedWpId:string;
   public externalFormToggle: boolean;
-  public fixedRelationType;
-  protected relationTitles:Object;
-  public workPackage;
+  public fixedRelationType:string;
+  protected relationTitles = this.WpRelationsCreateService.relationTitles;
 
   constructor(protected $scope,
-              protected $rootScope,
-              protected NotificationsService,
-              protected $q,
-              protected $http,
-              protected PathHelper,
-              protected WorkPackageParentRelationGroup,
-              protected I18n,
-              protected wpCacheService,
+              protected WpRelationsCreateService,
               protected wpNotificationsService) {
 
-    this.relationTitles = {
-      parent: I18n.t('js.relation_labels.parent'),
-      children: I18n.t('js.relation_labels.children'),
-      relatedTo: I18n.t('js.relation_labels.relates'),
-      duplicates: I18n.t('js.relation_labels.duplicates'),
-      duplicated: I18n.t('js.relation_labels.duplicated'),
-      blocks: I18n.t('js.relation_labels.blocks'),
-      blocked: I18n.t('js.relation_labels.blocked'),
-      precedes: I18n.t('js.relation_labels.precedes'),
-      follows: I18n.t('js.relation_labels.follows')
-    };
-    
     // Default relationType
     var defaultRelationType = angular.isDefined(this.fixedRelationType) ? this.fixedRelationType : 'relatedTo';
-    this.selectedRelationType = _.find(this.relationTypes, {name: defaultRelationType});
+    this.selectedRelationType = _.find(this.WpRelationsCreateService.relationTypes, {name: defaultRelationType});
   }
-
-  public relationTypes:any[] = [
-    {name: 'parent', type: 'parent'},
-    {name: 'children', type: 'children'},
-    {name: 'relatedTo', type: 'Relation::Relates', id: 'relates'},
-    {name: 'duplicates', type: 'Relation::Duplicates'},
-    {name: 'duplicated', type: 'Relation::Duplicated'},
-    {name: 'blocks', type: 'Relation::Blocks'},
-    {name: 'blocked', type: 'Relation::Blocked'},
-    {name: 'precedes', type: 'Relation::Precedes'},
-    {name: 'follows', type: 'Relation::Follows'}
-  ];
 
   public createRelation() {
 
-    if (this.selectedRelationType.name === 'children') {
-      this.addExistingChildWorkPackage();
-      return;
-    }
+    let relation_type = this.selectedRelationType.name === 'relatedTo' ? this.selectedRelationType.id : this.selectedRelationType.name;
 
-    this.selectedRelationType.addWpRelation(this.selectedWpId).then((res) => {
-      this.toggleRelationsCreateForm();
-      this.$rootScope.$emit('workPackagesRefreshInBackground');
+    this.workPackage.addRelation({
+      to_id: this.selectedWpId,
+      relation_type: relation_type
+    }).then(relation => {
+      if (!angular.isArray(this.workPackage.relations.elements)) {
+        this.workPackage.relations.elements = [];
+      }
+
+      this.$scope.$emit('wp-relations.added', relation);
       this.wpNotificationsService.showSave(this.workPackage);
-    });
-  }
-
-  public createNewChildWorkPackage() {
-    _.find(this.relationTypes, {type: 'children'}).addWpRelation();
+    }).finally(this.toggleRelationsCreateForm());
   }
 
   public toggleFixedRelationTypeForm() {
@@ -74,7 +42,6 @@ export class WpRelationsCreateController {
   }
 
   public toggleRelationsCreateForm() {
-    console.log(this);
     this.showRelationsCreateForm = !this.showRelationsCreateForm;
     this.externalFormToggle = !this.externalFormToggle;
   }
@@ -82,73 +49,31 @@ export class WpRelationsCreateController {
   public toggleExistingChildWorkPackageForm() {
     this.toggleRelationsCreateForm();
     if (this.showRelationsCreateForm) {
-      this.selectedRelationType = _.find(this.relationTypes, {name: 'children'});
+      this.selectedRelationType = _.find(this.WpRelationsCreateService.relationTypes, {name: 'children'});
 
     }
   }
-
-  public findRelatableWorkPackages(search:string) {
-    const deferred = this.$q.defer();
-    var params;
-
-    this.workPackage.project.$load().then(() => {
-      params = {
-        q: search,
-        scope: 'relatable',
-        escape: false,
-        id: this.workPackage.id,
-        project_id: this.workPackage.project.id
-      };
-
-      this.$http({
-        method: 'GET',
-        url: URI(this.PathHelper.workPackageJsonAutoCompletePath()).search(params).toString()
-      })
-        .then((response:any) => deferred.resolve(response.data))
-        .catch(deferred.reject);
-    })
-      .catch(deferred.reject);
-
-    return deferred.promise;
-  }
-
-  protected addExistingChildWorkPackage() {
-    this.toggleExistingChildWorkPackageForm();
-    this.wpCacheService.loadWorkPackage(this.selectedWpId).first().subscribe(childWp => {
-      childWp.changeParent({
-        parentId: this.workPackage.id,
-        lockVersion: childWp.lockVersion
-      }).then( (updatedWp) => {
-        if (!angular.isArray(this.workPackage.children)) {
-          this.workPackage.children = [];
-        }
-        this.workPackage.subject = "Hallo Welt";
-        this.workPackage.children.push(childWp);
-        this.workPackage.save().then(wp => this.selectedRelationType.handleSuccess([wp, childWp]);)
-
-      });
-    });
-  }
-
-
 }
 
 function wpRelationsCreate() {
   return {
     restrict: 'E',
     replace: true,
+
     templateUrl: (el, attrs) => {
       return '/components/wp-relations/wp-relations-create/' + attrs.template + '.template.html';
     },
-    controller: WpRelationsCreateController,
-    bindToController: true,
-    controllerAs: '$relationsCreateCtrl',
+
     scope: {
       relationTypes: '=?',
       workPackage: '=?',
       fixedRelationType: '@?',
       externalFormToggle: '=?'
-    }
+    },
+
+    controller: WpRelationsCreateController,
+    bindToController: true,
+    controllerAs: '$relationsCreateCtrl',
   };
 }
 

@@ -11,10 +11,12 @@ class WpRelationsHierarchyRowDirectiveController {
   public relationType;
   public indentBy;
 
-  constructor(protected $scope, protected wpCacheService, protected PathHelper) {
-    console.log(this.relationType);
+  constructor(protected $scope,
+              protected wpCacheService,
+              protected PathHelper,
+              protected wpNotificationsService) {
     if (this.relationType) {
-      wpCacheService.loadWorkPackage(this.workPackage.id).subscribe(wp => {
+      wpCacheService.loadWorkPackage(this.workPackage.id).take(1).subscribe(wp => {
         this.wpForm = wp;
       });
     }else {
@@ -27,15 +29,26 @@ class WpRelationsHierarchyRowDirectiveController {
     if (this.workPackage.type && !hideType) {
       type += this.workPackage.type.name + ': ';
     }
-    return `#${this.workPackage.id}${type}${this.workPackage.subject}`;
+    return `${type}${this.workPackage.subject}`;
   }
 
   public removeRelation() {
     if (this.relationType === 'child') {
       //remove child
     }else if (this.relationType === 'parent') {
-      this.workPackage.changeParent(null);
+      this.changeParent(null).then((wp) => {
+        this.wpNotificationsService.showSave(this.workPackage);
+      });
     }
+  }
+
+  protected changeParent(wpId) {
+    var params = {
+      parentId: wpId,
+      lockVersion: this.workPackage.lockVersion
+    };
+
+    return this.workPackage.changeParent(params);
   }
 }
 

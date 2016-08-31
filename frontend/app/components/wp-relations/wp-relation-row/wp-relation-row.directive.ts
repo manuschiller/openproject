@@ -13,15 +13,19 @@ class WpRelationRowDirectiveController {
 
   public workPackagePath = this.PathHelper.workPackagePath;
   public showRelationControls:boolean;
-  public showRelationInfo:boolean;
+  public showRelationInfo:boolean = false;
 
-  constructor(protected $scope, protected $element, protected wpCacheService, protected PathHelper) {
+  constructor(protected $scope,
+              protected $element,
+              protected wpCacheService,
+              protected PathHelper,
+              protected wpNotificationsService) {
     if (this.relatedWorkPackage.relatedBy) {
       this.relationType = this.relatedWorkPackage.relatedBy._type.split('::').pop();
     }
     wpCacheService.loadWorkPackage(this.relatedWorkPackage.id).subscribe(wp => {
       this.wpForm = wp;
-    })
+    });
   };
 
 
@@ -35,7 +39,10 @@ class WpRelationRowDirectiveController {
   }
 
   public removeRelation() {
+    var relatedBy = this.relatedWorkPackage.relatedBy;
     this.relatedWorkPackage.relatedBy.remove().then(res => {
+      this.$scope.$emit('wp-relations.removed', relatedBy);
+      this.wpNotificationsService.showSave(this.relatedWorkPackage);
       this.wpCacheService.updateWorkPackage([this.relatedWorkPackage]);
     });
   }

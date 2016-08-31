@@ -42,7 +42,8 @@ export class WorkPackageSingleRelationController {
     if (workPackage.type && !hideType) {
       type += workPackage.type.name + ': ';
     }
-    return `#${workPackage.id}${type}${workPackage.subject}`;
+    //return `#${workPackage.id}${type}${workPackage.subject}`;
+    return workPackage.subject;
   }
 
   public canRemoveRelation(relation):boolean {

@@ -17,11 +17,9 @@
 
         <div class="grid-content medium-2 collapse" style="text-align:right;">
             <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
-                    execute="$ctrl.removeRelation($ctrl.relation)">
+                    execute="$ctrl.showRelationInfo = !$ctrl.showRelationInfo">
                 <icon-wrapper icon-name="info1"
-                              icon-title="'Info for related workpackage'"
-                              ng-mouseover="$ctrl.showRelationInfo = true"
-                              ng-mouseleave="$ctrl.showRelationInfo = false">
+                              icon-title="'Info for related workpackage'">
                 </icon-wrapper>
             </accessible-by-keyboard>
 

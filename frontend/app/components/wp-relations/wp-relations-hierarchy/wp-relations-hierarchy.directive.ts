@@ -27,27 +27,28 @@
 //++
 
 import {wpTabsModule} from '../../../angular-modules';
+import {WorkPackageResourceInterface} from "../../api/api-v3/hal-resources/work-package-resource.service";
+import {RelatedWorkPackage} from "../wp-relations.interfaces";
 
 export class WorkPackageRelationsHierarchyController {
   public relationTypes;
   public parent;
   public children = [];
-  public workPackage;
+  public workPackage:RelatedWorkPackage;
 
   constructor(protected $q) {
     if (this.workPackage.parentId) {
-      this.workPackage.parent.$load(true).then(parent => {
+      this.workPackage.parent.$load(true).then((parent:WorkPackageResourceInterface) => {
         this.parent = parent;
       });
     }
-    var relatedChildrenPromises = [];
-    this.workPackage.children.forEach(child => {
-      relatedChildrenPromises.push(child.$load());
-    });
-    $q.all(relatedChildrenPromises).then(children => {
-      this.children = children;
-    });
+    if (this.workPackage.children) {
+      let relatedChildrenPromises = [];
 
+      this.workPackage.children.forEach(child => relatedChildrenPromises.push(child.$load()));
+
+      $q.all(relatedChildrenPromises).then(children => this.children = children);
+    }
   }
 
   public removeParentRelation() {
@@ -57,7 +58,7 @@ export class WorkPackageRelationsHierarchyController {
   public removeRelation() {
     this.workPackage.relatedBy.remove().then(res => {
       console.log("successfully removed", res);
-    })
+    });
   }
 }
 

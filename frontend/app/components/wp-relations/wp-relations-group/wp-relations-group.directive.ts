@@ -27,18 +27,14 @@
 //++
 
 import {wpTabsModule} from '../../../angular-modules';
+import {RelatedWorkPackage} from '../wp-relations.interfaces';
+import {WorkPackageResourceInterface} from '../../api/api-v3/hal-resources/work-package-resource.service';
 
 
 export class WorkPackageRelationsGroupController {
-  public workPackage;
-  public wpType;
-  public relatedWorkPackages;
-
-  constructor(protected $scope,
-              protected $q,
-              protected I18n,
-              protected NotificationsService) {
-  }
+  public relatedWorkPackages:Array<RelatedWorkPackage>;
+  public workPackage:WorkPackageResourceInterface;
+  public wpType:string;
 }
 
 function wpRelationsDirective() {

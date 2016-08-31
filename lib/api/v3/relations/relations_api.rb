@@ -48,7 +48,6 @@ module API
             optional :to_id, desc: 'Id of related work package'
             optional :relation_type, desc: 'Type of relationship'
             optional :delay
-            optional :relation_description
           end
           post do
             authorize(:manage_work_package_relations, context: @work_package.project)
@@ -58,7 +57,6 @@ module API
               r.to = WorkPackage.visible.find_by(id: declared_params[:to_id].match(/\d+/).to_s)
               r.relation_type = declared_params[:relation_type]
               r.delay = declared_params[:delay_id]
-              r.relation_description = declared_params[:relation_description]
             end
 
             if relation.valid? && relation.save

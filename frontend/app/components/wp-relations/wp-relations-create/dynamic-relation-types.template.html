@@ -21,18 +21,23 @@
             </div>
             <div class="grid-content medium-7">
                 <wp-relations-autocomplete
+                        work-package="$relationsCreateCtrl.workPackage"
                         selected-wp-id="$relationsCreateCtrl.selectedWpId"
                         selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
             </div>
-            <div class="grid-content medium-1 collapse">
-                <span ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark grid-content collapse" title="Save relation" icon-name="checkmark" icon-title="Save relation">
-                  <span class="hidden-for-sighted ng-binding">Save relation</span>
-                </span>
-            </div>
-            <div class="grid-content medium-1 collapse">
-                <span ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" class="icon-context icon-button icon-remove grid-content collapse" title="Cancel" icon-name="remove" icon-title="Cancel">
-                  <span class="hidden-for-sighted ng-binding">Cancel</span>
-                </span>
+            <div class="grid-content medium-2 collapse" style="line-height: 1.5em; text-align: right;">
+                <accessible-by-keyboard
+                                        execute="$relationsCreateCtrl.createRelation()">
+                    <icon-wrapper icon-name="checkmark"
+                                  icon-title="'remove relation'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+                <accessible-by-keyboard
+                                        execute="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                    <icon-wrapper icon-name="remove"
+                                  icon-title="'remove relation'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
             </div>
         </div>
 

@@ -81,10 +81,6 @@
                 ui-sref-active="selected">
               <a href="" ng-bind="::$ctrl.text.tabs.activity"/>
             </li>
-            <li ui-sref="work-packages.show.relations({})"
-                ui-sref-active="selected">
-              <a href="" ng-bind="::$ctrl.text.tabs.relations"/>
-            </li>
             <li ng-if="$ctrl.canViewWorkPackageWatchers()"
                 ui-sref="work-packages.show.watchers({})"
                 ui-sref-active="selected">

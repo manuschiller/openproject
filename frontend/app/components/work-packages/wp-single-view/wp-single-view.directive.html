@@ -106,5 +106,5 @@
       data-ng-show="!$ctrl.hideEmptyFields || $ctrl.attachments.length > 0">
   </wp-attachments>
 
-  <wp-relations work-package="$ctrl.workPackage"></wp-relations>
+  <wp-relations work-package="$ctrl.workPackage" ng-if="!$ctrl.workPackage.isNew"></wp-relations>
 </div>

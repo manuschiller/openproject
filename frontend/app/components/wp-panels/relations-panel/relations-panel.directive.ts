@@ -43,8 +43,7 @@ export class RelationsPanelController {
   constructor(protected I18n:op.I18n,
               protected $scope,
               protected $q,
-              protected wpCacheService,
-              protected wpRelationsService:WorkPackageRelationsService) {
+              protected wpCacheService) {
 
     this.relationTitles = {
       parent: I18n.t('js.relation_buttons.change_parent'),
@@ -57,35 +56,7 @@ export class RelationsPanelController {
       precedes: I18n.t('js.relation_buttons.add_precedes'),
       follows: I18n.t('js.relation_buttons.add_follows')
     };
-
-    //this.buildRelationGroups(this.workPackage);
-
-    var promiseChain = [];
-
-
-    if (this.workPackage.parent) {
-      console.log('has parent');
-      promiseChain.push(this.workPackage.parent.$load());
-    }
-
-    this.workPackage.relations.$load().then(relations => {
-      relations.$embedded.elements.forEach(relation => {
-        if (relation.relatedTo.href === this.workPackage.href) {
-          promiseChain.push(relation.relatedFrom.$load());
-        }
-        promiseChain.push(relation.relatedTo.$load());
-      });
-      $q.all(promiseChain).then(res => {
-        if (angular.isArray(this.workPackage.children)) {
-          res.push(...this.workPackage.children);
-        }
-
-        this.relationGroups = (_.groupBy(res, (wp) => { return wp.type.name; }) as Array);
-          console.log(this.relationGroups);
-        });
-    });
-
-
+    
       /*
     });
     /*Rx.Observable

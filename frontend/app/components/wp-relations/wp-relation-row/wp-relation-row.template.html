@@ -1,4 +1,4 @@
-<div ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
+<div class="relation-row" wp-single-relation ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
     <div class="grid-block hierarchy-item">
 
         <div class="grid-content medium-2 collapse">
@@ -6,30 +6,38 @@
         </div>
 
         <div class="grid-content medium-5 collapse">
-            <a href="$ctrl.relatedWorkPackage.$links.activities">
-                #{{$ctrl.relatedWorkPackage.id}} {{ $ctrl.relatedWorkPackage.subject }}
+            <a href="{{$singleRelation.workPackagePath($ctrl.relatedWorkPackage.id)}}">
+                {{$singleRelation.getFullIdentifier($ctrl.relatedWorkPackage, true)}}
             </a>
         </div>
 
-        <div class="grid-content medium-3 collapse">{{$ctrl.relatedWorkPackage.status.name}}</div>
-        <!--<div class="grid-content medium-3 collapse" wp-edit-form="$ctrl.relatedWorkPackage">
+        <div class="grid-content medium-3 collapse" wp-edit-form="$ctrl.wpForm" ng-if="$ctrl.wpForm">
             <div wp-edit-field="'status'"></div>
-        </div>-->
+        </div>
 
         <div class="grid-content medium-2 collapse" style="text-align:right;">
             <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
                     execute="$ctrl.removeRelation($ctrl.relation)">
                 <icon-wrapper icon-name="info1"
-                              icon-title="'Info for related workpackage'">
+                              icon-title="'Info for related workpackage'"
+                              ng-mouseover="$ctrl.showRelationInfo = true"
+                              ng-mouseleave="$ctrl.showRelationInfo = false">
                 </icon-wrapper>
             </accessible-by-keyboard>
 
             <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
+                                    ng-if="$singleRelation.canRemoveRelation($ctrl.relatedWorkPackage.relatedBy)"
                     execute="$ctrl.removeRelation($ctrl.relation)">
                 <icon-wrapper icon-name="remove"
                               icon-title="'remove relation'">
                 </icon-wrapper>
             </accessible-by-keyboard>
         </div>
+    </div>
+    <div class="grid-block hierarchy-item" style="border: 1px dotted lightblue; padding:4px;" ng-show="$ctrl.showRelationInfo">
+        <div class="grid-content medium-12 collapse">
+            This is a description for the relation to #{{$ctrl.relatedWorkPackage.id}} {{ $ctrl.relatedWorkPackage.subject }}
+        </div>
+
     </div>
 </div>

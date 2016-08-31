@@ -1,31 +1,5 @@
 <div class="detail-panel-description" ng-if="$ctrl.workPackage">
   <div class="detail-panel-description-content">
-
-    <wp-relations-hierarchy
-      template="hierarchy"
-      work-package="$ctrl.workPackage"
-      relation-types="$ctrl.relationGroups"
-      parents="$ctrl.getParents()"
-      children="$ctrl.getChildren()">
-    </wp-relations-hierarchy>
-
-    <wp-relations-create
-            template="add-child"
-            work-package="$ctrl.workPackage"
-            fixed-relation-type="children"
-            relation-types="$ctrl.relationGroups">
-    </wp-relations-create>
-
-
-      <!--<wp-relations
-          ng-repeat="relationGroup in $ctrl.relationGroups"
-          work-package="$ctrl.workPackage"
-          relation-group="relationGroup"
-      ></wp-relations>
-      <wp-relations-create
-        template="dynamic-relation-types"
-        work-package="$ctrl.workPackage"
-        relation-types="$ctrl.relationGroups"
-        reload-relations="$ctrl.loadRelations()"></wp-relations-create>-->
+    <wp-relations work-package="$ctrl.workPackage"></wp-relations>
   </div>
 </div>

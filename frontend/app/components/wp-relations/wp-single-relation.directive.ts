@@ -26,40 +26,41 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-.detail-panel-description-content
-  .relation
-    h3
-      cursor: pointer
-      a
-        text-decoration: none
-        color: inherit
-      i
-        font-size: 0.8rem
+import {wpTabsModule} from '../../angular-modules';
+/**
+ * Contains methods and attributes shared across common relations 
+ * and parent child relations
+ */
+export class WorkPackageSingleRelationController {
+  public workPackagePath = this.PathHelper.workPackagePath;
 
-.add-relation
-  .select2
-    width: 350px
-  .select2-drop
-    width: 350px
-    top: auto
-    input[type='text']
-      width: 100%
+  constructor(protected PathHelper) {
+  }
 
-.tab-content--padding-right
-  padding-right: 25px
+  public getFullIdentifier(workPackage, hideType?:boolean) {
+    var type = ' ';
+    if (workPackage.type && !hideType) {
+      type += workPackage.type.name + ': ';
+    }
+    return `#${workPackage.id}${type}${workPackage.subject}`;
+  }
 
-.hierarchy-item
-  margin-bottom: 2px
+  public canRemoveRelation(relation):boolean {
+      return !!relation.remove;
+  }
 
-.relation-row
-  line-height: 1.5em
-  .attribute-header
-    font-size: 0.8em
-    text-transform: uppercase
-    font-weight: bold
+  public canAddRelation(workPackage) {
+    return !!workPackage.addRelation;
+  }
+}
 
-.relation-create
-  font-size: 0.8em
+function wpSingleRelationDirective() {
+  return {
+    restrict: 'A',
+    controller: WorkPackageSingleRelationController,
+    controllerAs: '$singleRelation',
+    bindToController: true,
+  };
+}
 
-
-
+wpTabsModule.directive('wpSingleRelation', wpSingleRelationDirective);

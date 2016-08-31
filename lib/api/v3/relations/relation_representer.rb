@@ -69,6 +69,10 @@ module API
 
         property :delay, render_nil: true, if: -> (*) { relation_type == 'precedes' }
 
+        def relation_description
+          represented.relation_description.camelize
+        end
+
         def _type
           "Relation::#{relation_type}"
         end

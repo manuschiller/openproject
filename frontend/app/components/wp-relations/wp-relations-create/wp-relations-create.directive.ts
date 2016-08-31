@@ -14,7 +14,9 @@ export class WpRelationsCreateController {
   constructor(protected $scope,
               protected $rootScope,
               protected NotificationsService,
-              //protected wpRelations,
+              protected $q,
+              protected $http,
+              protected PathHelper,
               protected WorkPackageParentRelationGroup,
               protected I18n,
               protected wpCacheService,
@@ -85,6 +87,31 @@ export class WpRelationsCreateController {
     }
   }
 
+  public findRelatableWorkPackages(search:string) {
+    const deferred = this.$q.defer();
+    var params;
+
+    this.workPackage.project.$load().then(() => {
+      params = {
+        q: search,
+        scope: 'relatable',
+        escape: false,
+        id: this.workPackage.id,
+        project_id: this.workPackage.project.id
+      };
+
+      this.$http({
+        method: 'GET',
+        url: URI(this.PathHelper.workPackageJsonAutoCompletePath()).search(params).toString()
+      })
+        .then((response:any) => deferred.resolve(response.data))
+        .catch(deferred.reject);
+    })
+      .catch(deferred.reject);
+
+    return deferred.promise;
+  }
+
   protected addExistingChildWorkPackage() {
     this.toggleExistingChildWorkPackageForm();
     this.wpCacheService.loadWorkPackage(this.selectedWpId).first().subscribe(childWp => {
@@ -102,6 +129,8 @@ export class WpRelationsCreateController {
       });
     });
   }
+
+
 }
 
 function wpRelationsCreate() {

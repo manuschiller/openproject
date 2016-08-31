@@ -7,11 +7,19 @@ import {
 
 class WpRelationsHierarchyRowDirectiveController {
   public workPackage;
+  public wpForm;
   public relationType;
   public indentBy;
 
   constructor(protected $scope, protected wpCacheService, protected PathHelper) {
-
+    console.log(this.relationType);
+    if (this.relationType) {
+      wpCacheService.loadWorkPackage(this.workPackage.id).subscribe(wp => {
+        this.wpForm = wp;
+      });
+    }else {
+      this.wpForm = this.workPackage;
+    }
   };
 
   public getFullIdentifier(hideType?:boolean) {

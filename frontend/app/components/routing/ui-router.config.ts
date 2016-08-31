@@ -59,7 +59,7 @@ const panels = {
     activity.url = '#{activity_no:\d+}';
 
     return activity;
-  },
+  }
 
   get relations() {
     return {

@@ -7,15 +7,24 @@ import {
 
 class WpRelationRowDirectiveController {
   public relatedWorkPackage;
+  public wpForm;
   public relation;
   public relationType;
+
+  public workPackagePath = this.PathHelper.workPackagePath;
   public showRelationControls:boolean;
+  public showRelationInfo:boolean;
 
   constructor(protected $scope, protected $element, protected wpCacheService, protected PathHelper) {
     if (this.relatedWorkPackage.relatedBy) {
       this.relationType = this.relatedWorkPackage.relatedBy._type.split('::').pop();
     }
+    wpCacheService.loadWorkPackage(this.relatedWorkPackage.id).subscribe(wp => {
+      this.wpForm = wp;
+    })
   };
+
+
 
   public getFullIdentifier(hideType?:boolean) {
     var type = ' ';

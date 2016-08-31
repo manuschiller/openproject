@@ -28,6 +28,7 @@
 
 import {wpTabsModule} from '../../angular-modules';
 import {WorkPackageNotificationService} from '../wp-edit/wp-notification.service';
+import {scopedObservable} from '../../helpers/angular-rx-utils';
 import {
   WorkPackageResource,
   WorkPackageResourceInterface
@@ -40,7 +41,7 @@ interface RelatedWorkPackage extends WorkPackageResourceInterface {
 
 export class WorkPackageRelationsController {
   public workPackage;
-  public relationGroups;
+  public relationGroups = [];
 
   private relationsCache = {
     relations: [],
@@ -51,19 +52,26 @@ export class WorkPackageRelationsController {
   constructor(protected $scope,
               protected $q,
               protected I18n,
-              protected WpRelationsService,
               protected wpCacheService,
               protected wpNotificationsService:WorkPackageNotificationService,
               protected NotificationsService) {
-    wpCacheService.loadWorkPackage(this.workPackage.id, true).subscribe(wp => {
-      console.log("wp relations changed",wp);
 
-        this.workPackage.$load(true).then(wp => {
-          this.workPackage = wp;
-          this.loadRelations();
-        });
 
-    });
+  this.workPackage.addRelation({
+    to_id: "138",
+    relation_type: 'relatedTo'
+  }).then(relation => {
+    console.log("created relation", relation);
+  });
+
+    scopedObservable(this.$scope, this.wpCacheService.loadWorkPackage(this.workPackage.id))
+      .subscribe((wp:WorkPackageResourceInterface) => {
+        this.workPackage = wp;
+        console.log("workPackage changed!!", this.workPackage);
+        console.log("relations count", this.workPackage.relations.count);
+      });
+
+    this.loadRelations();
   }
 
   protected loadRelations() {
@@ -71,13 +79,15 @@ export class WorkPackageRelationsController {
     var wpRelations = [];
 
     this.workPackage.relations.$load(true).then(relations => {
+      console.log("initial relations", relations);
       relations.$embedded.elements.forEach(relation => {
         if (relation.relatedTo.href === this.workPackage.href) {
           relatedWpPromises.push(relation.relatedFrom.$load(true));
           wpRelations[relation.relatedFrom.href.split('/').pop()] = relation;
+        } else {
+          relatedWpPromises.push(relation.relatedTo.$load(true));
+          wpRelations[relation.relatedTo.href.split('/').pop()] = relation;
         }
-        relatedWpPromises.push(relation.relatedTo.$load(true));
-        wpRelations[relation.relatedTo.href.split('/').pop()] = relation;
       });
 
       this.$q.all(relatedWpPromises).then(relatedWorkPackages => {
@@ -90,8 +100,7 @@ export class WorkPackageRelationsController {
           wps.forEach(wp => {
             (wp as RelatedWorkPackage).relatedBy = wpRelations[wp.id];
           });
-          this.relationGroups.length = 0;
-          angular.extend(this.relationGroups, _.groupBy(relatedWorkPackages, (wp) => { return wp.type.name; }) as Array);
+          this.relationGroups = (_.groupBy(wps, (wp) => { return wp.type.name; }) as Array);
           console.log("relation groups", this.relationGroups);
         });
 

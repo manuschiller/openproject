@@ -1,4 +1,4 @@
-<div>
+<div class="relation-row" ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
     <div class="grid-block v-align hierarchy-item">
         <div class="grid-content medium-6 collapse">
             <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
@@ -6,27 +6,29 @@
             </span>
         </div>
         <div class="grid-content medium-4 collapse" style="margin-left:2px;">
-            {{$ctrl.workPackage.status.name}}
-            <!--<div wp-edit-form="$ctrl.workPackage" ng-if="$ctrl.workPackage">
+            <!--{{$ctrl.workPackage.status.name}}-->
+            <div wp-edit-form="$ctrl.wpForm" ng-if="$ctrl.wpForm">
                 <div wp-edit-field="'status'"
                         wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
                 </div>
-            </div>-->
+            </div>
         </div>
-        <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard execute="$ctrl.toggleEditForm()" ng-if="$ctrl.relationType == 'parent'"
-                <icon-wrapper icon-name="edit"
-                              icon-title="'foo'">
-                </icon-wrapper>
-            </accessible-by-keyboard>
-        </div>
-        <div class="grid-content medium-1 collapse">
-            <accessible-by-keyboard ng-if="$ctrl.relationType"
-                                    execute="$ctrl.removeRelation()">
-                <icon-wrapper icon-name="remove"
-                              icon-title="'foo'">
-                </icon-wrapper>
-            </accessible-by-keyboard>
+        <div class="grid-content medium-2 collapse" style="text-align: right;">
+            <div ng-hide="!$ctrl.showRelationControls">
+                <accessible-by-keyboard ng-hide="$ctrl.relationType !== 'parent'"
+                                        execute="$ctrl.removeRelation()">
+                    <icon-wrapper icon-name="edit"
+                                  icon-title="'foo1'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+
+                <accessible-by-keyboard ng-hide="!$ctrl.relationType"
+                        execute="$ctrl.removeRelation()">
+                    <icon-wrapper icon-name="remove"
+                                  icon-title="'foo2'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+            </div>
         </div>
     </div>
 

@@ -29,44 +29,50 @@
 import {wpTabsModule} from '../../angular-modules';
 import {RelatedWorkPackage, RelatedWorkPackagesGroup} from './wp-relations.interfaces';
 
-import {
-  WorkPackageResourceInterface
-} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {WorkPackageCacheService} from '../work-packages/work-package-cache.service';
 
 export class WorkPackageRelationsController {
   public relationGroups:RelatedWorkPackagesGroup = [];
   public workPackage:WorkPackageResourceInterface;
-  protected currentRelations = [];
 
-  constructor(protected $scope,
-              protected $q,
-              protected I18n) {
+  protected currentRelations = Array<RelatedWorkPackage>;
 
-    this.loadRelations();
+  constructor(protected $scope:ng.IScope,
+              protected $q:ng.IQService,
+              protected wpCacheService:WorkPackageCacheService) {
 
-    $scope.$on('wp-relations.added', this.addSingleRelation);
-    $scope.$on('wp-relations.removed', this.removeSingleRelation);
+    this.registerEventListeners();
+    
+    if (!this.workPackage.relations.$loaded) {
+      this.workPackage.relations.$load().then(relations => {
+        this.loadRelations();
+      });
+    } else {
+      this.loadRelations();
+    }
   }
 
-  protected addSingleRelation(evt, relation):void {
-    this.getRelationLoadPromise(relation).then((relatedWorkPackage:RelatedWorkPackage) => {
-      relatedWorkPackage.relatedBy = relation;
-      this.buildRelationGroups();
-    });
-  }
-
-  protected removeSingleRelation(evt, relation):void {
+  protected removeSingleRelation(evt, relation) {
     this.currentRelations = _.remove(this.currentRelations, (latestRelation) => {
       return latestRelation.relatedBy.href !== relation.href;
     });
     this.buildRelationGroups();
   }
 
-  protected getRelationLoadPromise(relation):Promise {
-    if (relation.relatedTo.href === this.workPackage.href) {
-      return relation.relatedFrom.$load();
+
+  protected getRelatedWorkPackages(workPackageIds:Array<String>) {
+    let observablesToGetZipped = [];
+    workPackageIds.forEach(wpId => {
+      observablesToGetZipped.push(this.wpCacheService.loadWorkPackage(wpId));
+    });
+
+    if (observablesToGetZipped.length > 1) {
+      return Rx.Observable
+        .zip(observablesToGetZipped)
+        .take(1);
     } else {
-      return relation.relatedTo.$load();
+      return observablesToGetZipped[0].take(1);
     }
   }
 
@@ -78,37 +84,47 @@ export class WorkPackageRelationsController {
     }
   }
 
-  protected loadRelations():void {
-    var relatedWpPromises = Array<Promise>;
-    var wpRelations = [];
+  protected buildRelationGroups() {
+    this.relationGroups = (_.groupBy(this.currentRelations, (wp) => {
+      return wp.type.name;
+    }) as Array);
+  }
 
-    this.workPackage.relations.$load(true).then(relations => {
-      if (relations.count > 0) {
-        relations.$embedded.elements.forEach(relation => {
-          relatedWpPromises.push(this.getRelationLoadPromise(relation));
-          // TODO: use underscore's map instead of mapping to arrays manually
-          wpRelations[this.getRelatedWorkPackageId(relation)] = relation;
-        });
-
-        this.$q.all(relatedWpPromises).then(relatedWorkPackages => {
-          var loadWps = [];
-
-          relatedWorkPackages.forEach(wp => loadWps.push(wp.$load()));
-
-          this.$q.all(loadWps).then(wps => {
-            wps.forEach(wp => (wp as RelatedWorkPackage).relatedBy = wpRelations[wp.id]);
-
-            this.currentRelations = wps;
-            this.buildRelationGroups();
-          });
-        });
-      }
-
+  protected addSingleRelation(evt, relation) {
+    var relatedWorkPackageId = [this.getRelatedWorkPackageId(relation)];
+    this.getRelatedWorkPackages(relatedWorkPackageId).subscribe((relatedWorkPackage:RelatedWorkPackage) => {
+      relatedWorkPackage.relatedBy = relation;
+      this.currentRelations.push(relatedWorkPackage);
+      this.buildRelationGroups();
     });
   }
 
-  protected buildRelationGroups():void {
-    this.relationGroups = (_.groupBy(this.currentRelations, (wp) => { return wp.type.name; }) as Array);
+  protected loadRelations():void {
+    // TODO: could be easier to map the relations to the corresponding wps...
+    var relatedWpIds = [];
+    var relations = [];
+
+    console.log(this.workPackage);
+
+    this.workPackage.relations.elements.forEach(relation => {
+      relatedWpIds.push(this.getRelatedWorkPackageId(relation));
+      relations[this.getRelatedWorkPackageId(relation)] = relation;
+    });
+
+    this.getRelatedWorkPackages(relatedWpIds)
+      .subscribe(relatedWorkPackages => {
+        relatedWorkPackages.forEach(relatedWorkPackage => {
+          relatedWorkPackage.relatedBy = relations[relatedWorkPackage.id];
+        });
+
+        this.currentRelations = relatedWorkPackages;
+        this.buildRelationGroups();
+      });
+  }
+
+  private registerEventListeners() {
+    this.$scope.$on('wp-relations.added', this.addSingleRelation.bind(this));
+    this.$scope.$on('wp-relations.removed', this.removeSingleRelation.bind(this));
   }
 }
 

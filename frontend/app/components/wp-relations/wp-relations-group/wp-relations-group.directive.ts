@@ -37,7 +37,8 @@ export class WorkPackageRelationsGroupController {
   public wpType:string;
 }
 
-function wpRelationsDirective() {
+function wpRelationsGroupDirective() {
+  // TODO: Possibly obsolete now
   return {
     restrict: 'E',
     replace: true,
@@ -55,4 +56,4 @@ function wpRelationsDirective() {
   };
 }
 
-wpTabsModule.directive('wpRelationsGroup', wpRelationsDirective);
+wpTabsModule.directive('wpRelationsGroup', wpRelationsGroupDirective);

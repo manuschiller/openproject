@@ -29,6 +29,7 @@
 import {wpTabsModule} from '../../../angular-modules';
 import {WorkPackageResourceInterface} from "../../api/api-v3/hal-resources/work-package-resource.service";
 import {RelatedWorkPackage} from "../wp-relations.interfaces";
+import {WorkPackageCacheService} from "../../work-packages/work-package-cache.service";
 
 export class WorkPackageRelationsHierarchyController {
   public relationTypes;
@@ -36,9 +37,13 @@ export class WorkPackageRelationsHierarchyController {
   public children = [];
   public workPackage:RelatedWorkPackage;
 
-  constructor(protected $q) {
+  constructor(protected $q:ng.IQService, protected wpCacheService) {
+    // TODO: refactor to using wpCacheService instead of $q
+
     if (this.workPackage.parentId) {
-      this.workPackage.parent.$load(true).then((parent:WorkPackageResourceInterface) => {
+      this.wpCacheService.loadWorkPackage(this.workPackage.parentId)
+        .take(1)
+        .subscribe((parent:WorkPackageResourceInterface) => {
         this.parent = parent;
       });
     }
@@ -49,17 +54,21 @@ export class WorkPackageRelationsHierarchyController {
 
       $q.all(relatedChildrenPromises).then(children => this.children = children);
     }
+
   }
 
   public removeParentRelation() {
     this.workPackage.changeParent(null).then(res => console.log(res));
   }
 
-  public removeRelation() {
-    this.workPackage.relatedBy.remove().then(res => {
-      console.log("successfully removed", res);
-    });
+  public changeParent(){
+    // TODO
   }
+
+  public removeChildRelation() {
+    // TODO
+  }
+
 }
 
 function wpRelationsDirective() {

@@ -23,9 +23,7 @@ class WpRelationRowDirectiveController {
     if (this.relatedWorkPackage.relatedBy) {
       this.relationType = this.relatedWorkPackage.relatedBy._type.split('::').pop();
     }
-    wpCacheService.loadWorkPackage(this.relatedWorkPackage.id).subscribe(wp => {
-      this.wpForm = wp;
-    });
+    this.wpForm = this.relatedWorkPackage;
   };
 
 

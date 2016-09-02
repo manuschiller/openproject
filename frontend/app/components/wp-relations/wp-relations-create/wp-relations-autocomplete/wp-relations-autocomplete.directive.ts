@@ -49,7 +49,11 @@ function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
 
         findRelatableWorkPackages(term).then(workPackages => {
           // TODO: filter self and already related wps
-          scope.options = workPackages;
+          scope.options = _.filter(workPackages, (wp) => {
+            const id = parseInt(wp.id);
+            // TODO: add filter for existing relations
+            return id !== scope.workPackage.id;
+          });
         });
       };
 

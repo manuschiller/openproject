@@ -9,32 +9,33 @@ export class WpRelationsCreateController {
   public selectedWpId:string;
   public externalFormToggle: boolean;
   public fixedRelationType:string;
+  public relationTypes = this.WpRelationsCreateService.relationTypes;
   protected relationTitles = this.WpRelationsCreateService.relationTitles;
 
   constructor(protected $scope,
               protected WpRelationsCreateService,
               protected wpNotificationsService) {
 
-    // Default relationType
     var defaultRelationType = angular.isDefined(this.fixedRelationType) ? this.fixedRelationType : 'relatedTo';
     this.selectedRelationType = _.find(this.WpRelationsCreateService.relationTypes, {name: defaultRelationType});
   }
 
   public createRelation() {
+    // TODO: ADD ERROR HANDLING
 
     let relation_type = this.selectedRelationType.name === 'relatedTo' ? this.selectedRelationType.id : this.selectedRelationType.name;
-
-    this.workPackage.addRelation({
+    const params = {
       to_id: this.selectedWpId,
       relation_type: relation_type
-    }).then(relation => {
-      if (!angular.isArray(this.workPackage.relations.elements)) {
-        this.workPackage.relations.elements = [];
-      }
+    };
 
-      this.$scope.$emit('wp-relations.added', relation);
-      this.wpNotificationsService.showSave(this.workPackage);
-    }).finally(this.toggleRelationsCreateForm());
+    this.workPackage.addRelation(params)
+      .then(relation => {
+        this.$scope.$emit('wp-relations.added', relation);
+        this.wpNotificationsService.showSave(this.workPackage);
+      })
+      .catch(err => console.log(err))
+      .finally(this.toggleRelationsCreateForm());
   }
 
   public toggleFixedRelationTypeForm() {
@@ -44,14 +45,6 @@ export class WpRelationsCreateController {
   public toggleRelationsCreateForm() {
     this.showRelationsCreateForm = !this.showRelationsCreateForm;
     this.externalFormToggle = !this.externalFormToggle;
-  }
-
-  public toggleExistingChildWorkPackageForm() {
-    this.toggleRelationsCreateForm();
-    if (this.showRelationsCreateForm) {
-      this.selectedRelationType = _.find(this.WpRelationsCreateService.relationTypes, {name: 'children'});
-
-    }
   }
 }
 
@@ -65,7 +58,6 @@ function wpRelationsCreate() {
     },
 
     scope: {
-      relationTypes: '=?',
       workPackage: '=?',
       fixedRelationType: '@?',
       externalFormToggle: '=?'

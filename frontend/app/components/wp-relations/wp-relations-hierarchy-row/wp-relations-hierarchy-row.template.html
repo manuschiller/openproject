@@ -2,12 +2,12 @@
     <div class="grid-block v-align hierarchy-item">
         <div class="grid-content medium-6 collapse">
             <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
-                <a href="{{$ctrl.workPackage.$links.activities}}">{{$ctrl.getFullIdentifier()}}</a>
+                <a href="{{$ctrl.relatedWorkPackage.$links.activities}}">{{$ctrl.getFullIdentifier()}}</a>
             </span>
         </div>
         <div class="grid-content medium-4 collapse" style="margin-left:2px;">
-            <!--{{$ctrl.workPackage.status.name}}-->
-            <div wp-edit-form="$ctrl.wpForm" ng-if="$ctrl.wpForm">
+            <!--{{$ctrl.relatedWorkPackage.status.name}}-->
+            <div wp-edit-form="$ctrl.relatedWorkPackage" ng-if="$ctrl.relatedWorkPackage">
                 <div wp-edit-field="'status'"
                         wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
                 </div>
@@ -35,7 +35,7 @@
     <div class="grid-block hierarchy-item" ng-if="$ctrl.showEditForm">
         <div class="grid-content medium-12 collapse">
             <wp-relations-create
-                    work-package="$ctrl.workPackage"
+                    work-package="$ctrl.relatedWorkPackage"
                     template="add-fixed-type"
                     fixed-relation-type="parent"
                     external-form-toggle="$ctrl.showEditForm"></wp-relations-create>

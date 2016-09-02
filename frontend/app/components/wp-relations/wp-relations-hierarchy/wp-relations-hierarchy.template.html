@@ -20,11 +20,11 @@
     </div>
 
     <div ng-if="$ctrl.parent">
-        <wp-relations-hierarchy-row work-package="$ctrl.parent" relation-type="parent"></wp-relations-hierarchy-row>
+        <wp-relations-hierarchy-row work-package="$ctrl.workPackage" related-work-package="$ctrl.parent" relation-type="parent"></wp-relations-hierarchy-row>
     </div>
 
     <wp-relations-hierarchy-row work-package="$ctrl.workPackage" indent-by="20"></wp-relations-hierarchy-row>
-    <wp-relations-hierarchy-row work-package="relatedWorkPackage" indent-by="40" relation-type="child" ng-repeat="relatedWorkPackage in $ctrl.children"></wp-relations-hierarchy-row>
+    <wp-relations-hierarchy-row work-package="$ctrl.workPackage" related-work-package="relatedWorkPackage" indent-by="40" relation-type="child" ng-repeat="relatedWorkPackage in $ctrl.children"></wp-relations-hierarchy-row>
 
 
     <wp-relations-create work-package="workPackage" template="add-child"></wp-relations-create>

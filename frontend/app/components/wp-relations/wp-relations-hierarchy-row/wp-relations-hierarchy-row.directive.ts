@@ -7,7 +7,7 @@ import {
 
 class WpRelationsHierarchyRowDirectiveController {
   public workPackage;
-  public wpForm;
+  public relatedWorkPackage;
   public relationType;
   public indentBy;
 
@@ -15,12 +15,8 @@ class WpRelationsHierarchyRowDirectiveController {
               protected wpCacheService,
               protected PathHelper,
               protected wpNotificationsService) {
-    if (this.relationType) {
-      wpCacheService.loadWorkPackage(this.workPackage.id).take(1).subscribe(wp => {
-        this.wpForm = wp;
-      });
-    }else {
-      this.wpForm = this.workPackage;
+    if (!this.relatedWorkPackage) {
+      this.relatedWorkPackage = angular.copy(this.workPackage);
     }
   };
 
@@ -36,9 +32,7 @@ class WpRelationsHierarchyRowDirectiveController {
     if (this.relationType === 'child') {
       //remove child
     }else if (this.relationType === 'parent') {
-      this.changeParent(null).then((wp) => {
-        this.wpNotificationsService.showSave(this.workPackage);
-      });
+      this.changeParent(null);
     }
   }
 
@@ -48,7 +42,14 @@ class WpRelationsHierarchyRowDirectiveController {
       lockVersion: this.workPackage.lockVersion
     };
 
-    return this.workPackage.changeParent(params);
+    this.workPackage.changeParent(params).then((wp) => {
+      console.log("removed", wp);
+      this.wpCacheService.updateWorkPackage([this.workPackage]);
+      wp.save().then(wp => {
+        this.wpNotificationsService.showSave(this.workPackage);
+      })
+    }).catch(err => console.log(err))
+      .finally(any => console.log("finally", any));
   }
 }
 
@@ -60,6 +61,7 @@ function WpRelationsHierarchyRowDirective() {
     scope: {
       indentBy: '@?',
       workPackage: '=',
+      relatedWorkPackage: '=?',
       relationType: '@'
     },
     controller: WpRelationsHierarchyRowDirectiveController,

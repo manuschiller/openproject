@@ -43,13 +43,14 @@ export class WorkPackageRelationsController {
               protected wpCacheService:WorkPackageCacheService) {
 
     this.registerEventListeners();
-    
-    if (!this.workPackage.relations.$loaded) {
-      this.workPackage.relations.$load().then(relations => {
+    if(this.workPackage.relations.count > 0) {
+      if (!this.workPackage.relations.$loaded) {
+        this.workPackage.relations.$load().then(relations => {
+          this.loadRelations();
+        });
+      } else {
         this.loadRelations();
-      });
-    } else {
-      this.loadRelations();
+      }
     }
   }
 
@@ -103,9 +104,7 @@ export class WorkPackageRelationsController {
     // TODO: could be easier to map the relations to the corresponding wps...
     var relatedWpIds = [];
     var relations = [];
-
-    console.log(this.workPackage);
-
+    
     this.workPackage.relations.elements.forEach(relation => {
       relatedWpIds.push(this.getRelatedWorkPackageId(relation));
       relations[this.getRelatedWorkPackageId(relation)] = relation;

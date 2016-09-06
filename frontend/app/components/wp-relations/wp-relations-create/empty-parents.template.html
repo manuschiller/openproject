@@ -2,7 +2,7 @@
     <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
         <div class="grid-block">
             <div class="grid-content collapse">
-                <a class="wp-inline-create--add-link" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
                     <i class="icon icon-add"></i>
                     <span>Add existing parent work package</span>
                 </a>
@@ -10,20 +10,25 @@
         </div>
     </div>
     <div class="grid-block v-align" ng-if="$relationsCreateCtrl.showRelationsCreateForm || $relationsCreateCtrl.externalFormToggle">
-        <div class="grid-content medium-10">
+        <div class="grid-content medium-10 collapse">
             <wp-relations-autocomplete
+                    work-package="$relationsCreateCtrl.workPackage"
                     selected-wp-id="$relationsCreateCtrl.selectedWpId"
                     selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
         </div>
-        <div class="grid-content medium-1 collapse">
-                <span ng-click="$relationsCreateCtrl.createRelation()" class="icon-context icon-button icon-checkmark grid-content collapse" title="Save relation" icon-name="checkmark" icon-title="Save relation">
-                  <span class="hidden-for-sighted ng-binding">Save relation</span>
-                </span>
-        </div>
-        <div class="grid-content medium-1 collapse">
-                <span ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()" class="icon-context icon-button icon-remove grid-content collapse" title="Cancel" icon-name="remove" icon-title="Cancel">
-                  <span class="hidden-for-sighted ng-binding">Cancel</span>
-                </span>
+        <div class="grid-content medium-2 collapse" style="text-align: right;">
+            <accessible-by-keyboard
+                    execute="$relationsCreateCtrl.createRelation()">
+                <icon-wrapper icon-name="checkmark"
+                              icon-title="'save relation'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+            <accessible-by-keyboard
+                    execute="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                <icon-wrapper icon-name="remove"
+                              icon-title="'abort'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
         </div>
     </div>
 </div>

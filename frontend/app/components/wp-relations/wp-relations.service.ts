@@ -29,48 +29,84 @@
 import {wpTabsModule} from '../../angular-modules';
 import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
 
-export interface WorkPackageRelationsConfigInterface {
-  name:string;
-  type:string;
-  id?:string;
-}
+
 
 export class WorkPackageRelationsService {
-  constructor(protected $q) {
+  constructor(protected $rootScope,
+              protected I18n,
+              protected wpNotificationsService) {
+  
   }
 
-  public getWpRelationGroup(baseWorkPackage:WorkPackageResourceInterface, relatedWorkPackages, relations) {
+  public changeParent(workPackage, parentId) {
+    const params = {
+      parentId: parentId,
+      lockVersion: workPackage.lockVersion
+    };
+    return workPackage.changeParent(params);
+  }
 
-    var relationsObj = {
-      relation: []
+  public removeParent(workPackage) {
+    return this.changeParent(workPackage, null);
+  }
+
+  public addExistingChildWp(workPackage, relationType, relatedWorkPackage) {
+
+  }
+
+  public addNewChildWp() {
+    
+  }
+
+  public addCommonRelation(workPackage, relationType, relatedWpId) {
+    const params = {
+      to_id: relatedWpId,
+      relation_type: relationType
     };
 
-    relations.elements.forEach(relation => {
-      relationsObj.relation.push({
-        relation: relation,
-        relatedWp: _.find(relatedWorkPackages, (wp) => {
-          return wp.id === this.getRelatedWpId(relation, baseWorkPackage);
-        }),
-        isParent: false,
-        isChild: false
-      });
-    });
+    workPackage.addRelation(params);
+  }
+
+  public removeCommonRelation(relation, workPackage) {
+    relation.remove().then(result => {
+      this.handleSuccess('wp-relations.relationRemoved', workPackage);
+    })
+      .catch(error => this.handleError(error, workPackage));
+  }
+
+  public handleSuccess(successMessage:string, dataToEmit, updatedWorkPackage?:WorkPackageResourceInterface) {
+    this.$rootScope.$emit(successMessage, dataToEmit);
+    this.wpNotificationsService.showSave(updatedWorkPackage);
+  }
+
+  public handleError(error, workPackage?) {
+
+  }
+
+  public configuration = {
+    relationTitles: {
+      parent: this.I18n.t('js.relation_labels.parent'),
+      children: this.I18n.t('js.relation_labels.children'),
+      relatedTo: this.I18n.t('js.relation_labels.relates'),
+      duplicates: this.I18n.t('js.relation_labels.duplicates'),
+      duplicated: this.I18n.t('js.relation_labels.duplicated'),
+      blocks: this.I18n.t('js.relation_labels.blocks'),
+      blocked: this.I18n.t('js.relation_labels.blocked'),
+      precedes: this.I18n.t('js.relation_labels.precedes'),
+      follows: this.I18n.t('js.relation_labels.follows')
+    },
+    relationTypes: [
+      {name: 'parent', type: 'parent'},
+      {name: 'children', type: 'children'},
+      {name: 'relatedTo', type: 'Relation::Relates', id: 'relates'},
+      {name: 'duplicates', type: 'Relation::Duplicates'},
+      {name: 'duplicated', type: 'Relation::Duplicated'},
+      {name: 'blocks', type: 'Relation::Blocks'},
+      {name: 'blocked', type: 'Relation::Blocked'},
+      {name: 'precedes', type: 'Relation::Precedes'},
+      {name: 'follows', type: 'Relation::Follows'}
+    ]
   };
-
-  public relation(workPackage, relation) {
-
-  }
-
-  protected isParent(workPackage, relatedWorkPackage){
-    return (workPackage.parentId === relatedWorkPackage.id);
-  }
-
-  protected getRelatedWpId(relation, wp) {
-    if (relation.relatedTo.href === wp.href) {
-      return relation.relatedFrom.id;
-    }
-    return relation.relatedTo.id;
-  }
 }
 
 wpTabsModule.service('WpRelationsService', WorkPackageRelationsService);

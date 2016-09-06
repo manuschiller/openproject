@@ -1,24 +1,11 @@
 <div>
-    <div class="grid-block collapse" style="border-bottom: 1px solid #06799F; margin-top: 35px; line-height: 1.3em;">
-        <div class="grid-content collapse">
-            <div style="font-size: 24px; color: #06799F;">RELATED WORK PACKAGES</div>
-        </div>
-    </div>
-    <div class="grid-block collpase">
-        <div class="grid-content collpase">
-            <wp-relations-create work-package="$ctrl.workPackage"
-                                 template="dynamic-relation-types"></wp-relations-create>
-        </div>
-    </div>
-
     <div ng-repeat="(type, relatedWorkPackages) in $ctrl.relationGroups">
         <wp-relations-group wp-type="type"
                             related-work-packages="relatedWorkPackages"
                             work-package="$ctrl.workPackage"></wp-relations-group>
     </div>
-
-
-
+    <wp-relations-create work-package="$ctrl.workPackage"
+                         template="dynamic-relation-types"></wp-relations-create>
     <wp-relations-hierarchy work-package="$ctrl.workPackage"></wp-relations-hierarchy>
 </div>
 

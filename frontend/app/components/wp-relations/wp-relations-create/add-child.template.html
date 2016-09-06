@@ -10,7 +10,7 @@
                 </a>
             </div>
             <div class="grid-content collapse">
-                <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleExistingChildWorkPackageForm()">
+                <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
                     <i class="icon icon-add"></i>
                     <span>Add existing child work package</span>
                 </a>
@@ -20,7 +20,7 @@
     <div class="grid-block v-align" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
         <div class="grid-content medium-10">
             <wp-relations-autocomplete
-                    work-package="$relationsCtrl.workPackage"
+                    work-package="$relationsCreateCtrl.workPackage"
                     selected-wp-id="$relationsCreateCtrl.selectedWpId"
                     selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
         </div>

@@ -48,7 +48,6 @@ function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
         }
 
         findRelatableWorkPackages(term).then(workPackages => {
-          // TODO: filter self and already related wps
           scope.options = _.filter(workPackages, (wp) => {
             const id = parseInt(wp.id);
             // TODO: add filter for existing relations
@@ -60,7 +59,7 @@ function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
       function findRelatableWorkPackages(search:string) {
         const deferred = $q.defer();
         var params;
-
+        
         scope.workPackage.project.$load().then(() => {
           params = {
             q: search,

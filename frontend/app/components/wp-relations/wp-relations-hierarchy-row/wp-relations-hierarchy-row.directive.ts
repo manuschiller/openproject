@@ -10,46 +10,53 @@ class WpRelationsHierarchyRowDirectiveController {
   public relatedWorkPackage;
   public relationType;
   public indentBy;
+  public showEditForm: boolean = false;
 
   constructor(protected $scope,
               protected wpCacheService,
               protected PathHelper,
               protected wpNotificationsService) {
-    if (!this.relatedWorkPackage) {
+    if (!this.relatedWorkPackage && this.relationType !== 'parent') {
       this.relatedWorkPackage = angular.copy(this.workPackage);
     }
   };
 
   public getFullIdentifier(hideType?:boolean) {
     var type = ' ';
-    if (this.workPackage.type && !hideType) {
-      type += this.workPackage.type.name + ': ';
+    if (this.relatedWorkPackage.type && !hideType) {
+      type += this.relatedWorkPackage.type.name + ': ';
     }
-    return `${type}${this.workPackage.subject}`;
+    return `${type}${this.relatedWorkPackage.subject}`;
   }
 
   public removeRelation() {
     if (this.relationType === 'child') {
-      //remove child
+      this.removeChild();
+
     }else if (this.relationType === 'parent') {
-      this.changeParent(null);
+     this.removeParent();
     }
   }
 
-  protected changeParent(wpId) {
-    var params = {
-      parentId: wpId,
-      lockVersion: this.workPackage.lockVersion
-    };
+  protected removeChild() {
+    this.relatedWorkPackage.parentId = null;
+    this.relatedWorkPackage.save().then(relatedExChildWp => {
+      this.$scope.$emit('wp-relations.removedChild', relatedExChildWp);
+    });
+  }
 
-    this.workPackage.changeParent(params).then((wp) => {
-      console.log("removed", wp);
-      this.wpCacheService.updateWorkPackage([this.workPackage]);
-      wp.save().then(wp => {
-        this.wpNotificationsService.showSave(this.workPackage);
-      })
-    }).catch(err => console.log(err))
-      .finally(any => console.log("finally", any));
+  protected removeParent() {
+    this.changeParent(null);
+  }
+
+  protected changeParent(wpId) {
+    this.workPackage.parentId = wpId;
+    this.workPackage.save().then(wp => {
+      this.$scope.$emit('wp-relations.changedParent', {
+        updatedWp: this.workPackage,
+        parentId: wpId
+      });
+    });
   }
 }
 

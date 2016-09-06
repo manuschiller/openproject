@@ -260,6 +260,10 @@ en:
       blocked: "Blocked by"
       precedes: "Precedes"
       follows: "Follows"
+      includes: "Includes"
+      part_of: "Part of"
+      requires: "Requires"
+      required_by: "Required by"
 
     relation_buttons:
       change_parent: "Change parent"

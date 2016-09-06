@@ -19,9 +19,12 @@ class WpRelationRowDirectiveController {
               protected $element,
               protected wpCacheService,
               protected PathHelper,
-              protected wpNotificationsService) {
+              protected wpNotificationsService,
+              protected WpRelationsService) {
     if (this.relatedWorkPackage.relatedBy) {
-      this.relationType = this.relatedWorkPackage.relatedBy._type.split('::').pop();
+      console.log('relatedBy', this.relatedWorkPackage.relatedBy);
+      var relationType = _.find(this.WpRelationsService.configuration.relationTypes, {'type' : this.relatedWorkPackage.relatedBy._type});
+      this.relationType = angular.isDefined(relationType) ? this.WpRelationsService.configuration.relationTitles[relationType.name] : 'unknown';
     }
     this.wpForm = this.relatedWorkPackage;
   };

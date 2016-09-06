@@ -43,6 +43,7 @@ export class WorkPackageRelationsController {
               protected wpCacheService:WorkPackageCacheService) {
 
     this.registerEventListeners();
+
     if (!this.workPackage.relations.$loaded) {
       this.workPackage.relations.$load().then(relations => {
         this.loadRelations();

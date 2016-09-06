@@ -93,7 +93,11 @@ export class WorkPackageRelationsService {
       blocks: this.I18n.t('js.relation_labels.blocks'),
       blocked: this.I18n.t('js.relation_labels.blocked'),
       precedes: this.I18n.t('js.relation_labels.precedes'),
-      follows: this.I18n.t('js.relation_labels.follows')
+      follows: this.I18n.t('js.relation_labels.follows'),
+      includes: this.I18n.t('js.relation_labels.includes'),
+      partof: this.I18n.t('js.relation_labels.part_of'),
+      requires: this.I18n.t('js.relation_labels.requires'),
+      required: this.I18n.t('js.relation_labels.required_by')
     },
     relationTypes: [
       {name: 'parent', type: 'parent'},
@@ -104,7 +108,11 @@ export class WorkPackageRelationsService {
       {name: 'blocks', type: 'Relation::Blocks'},
       {name: 'blocked', type: 'Relation::Blocked'},
       {name: 'precedes', type: 'Relation::Precedes'},
-      {name: 'follows', type: 'Relation::Follows'}
+      {name: 'follows', type: 'Relation::Follows'},
+      {name: 'includes', type: 'Relation::Includes'},
+      {name: 'partof', type: 'Relation::Partof'},
+      {name: 'requires', type: 'Relation::Requires'},
+      {name: 'required', type: 'Relation::Required'}
     ]
   };
 }

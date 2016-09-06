@@ -11,6 +11,7 @@ class WpRelationsHierarchyRowDirectiveController {
   public relationType;
   public indentBy;
   public showEditForm: boolean = false;
+  public workPackagePath = this.PathHelper.workPackagePath;
 
   constructor(protected $scope,
               protected wpCacheService,

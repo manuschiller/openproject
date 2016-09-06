@@ -20,6 +20,10 @@ export class WpRelationsCreateController {
 
     var defaultRelationType = angular.isDefined(this.fixedRelationType) ? this.fixedRelationType : 'relatedTo';
     this.selectedRelationType = _.find(this.WpRelationsService.configuration.relationTypes, {name: defaultRelationType});
+
+    if (angular.isDefined(this.externalFormToggle)) {
+      this.showRelationsCreateForm = this.externalFormToggle;
+    }
   }
 
   public createRelation() {
@@ -73,7 +77,7 @@ export class WpRelationsCreateController {
   // TODO: avoid copy paste
   // move all create / update / remove actions to service
   protected changeParent() {
-    this.workPackage.parentId = this.selectedWpId;
+    this.workPackage.parentId = (this.selectedWpId as number);
       this.workPackage.save().then(updatedWp => {
           this.$scope.$emit('wp-relations.changedParent', {
             updatedWp: updatedWp,

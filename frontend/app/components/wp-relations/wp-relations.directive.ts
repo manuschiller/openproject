@@ -43,15 +43,14 @@ export class WorkPackageRelationsController {
               protected wpCacheService:WorkPackageCacheService) {
 
     this.registerEventListeners();
-    if(this.workPackage.relations.count > 0) {
-      if (!this.workPackage.relations.$loaded) {
-        this.workPackage.relations.$load().then(relations => {
-          this.loadRelations();
-        });
-      } else {
+    if (!this.workPackage.relations.$loaded) {
+      this.workPackage.relations.$load().then(relations => {
         this.loadRelations();
-      }
+      });
+    } else {
+      this.loadRelations();
     }
+
   }
 
   protected removeSingleRelation(evt, relation) {
@@ -86,9 +85,12 @@ export class WorkPackageRelationsController {
   }
 
   protected buildRelationGroups() {
-    this.relationGroups = (_.groupBy(this.currentRelations, (wp) => {
-      return wp.type.name;
-    }) as Array);
+    if(angular.isDefined(this.currentRelations)) {
+      console.log('currentRelations', this.currentRelations);
+      this.relationGroups = (_.groupBy(this.currentRelations, (wp) => {
+        return wp.type.name;
+      }) as Array);
+    }
   }
 
   protected addSingleRelation(evt, relation) {
@@ -104,7 +106,7 @@ export class WorkPackageRelationsController {
     // TODO: could be easier to map the relations to the corresponding wps...
     var relatedWpIds = [];
     var relations = [];
-    
+
     this.workPackage.relations.elements.forEach(relation => {
       relatedWpIds.push(this.getRelatedWorkPackageId(relation));
       relations[this.getRelatedWorkPackageId(relation)] = relation;
@@ -112,11 +114,17 @@ export class WorkPackageRelationsController {
 
     this.getRelatedWorkPackages(relatedWpIds)
       .subscribe(relatedWorkPackages => {
-        relatedWorkPackages.forEach(relatedWorkPackage => {
-          relatedWorkPackage.relatedBy = relations[relatedWorkPackage.id];
-        });
+        if(angular.isArray(relatedWorkPackages)){
+          relatedWorkPackages.forEach(relatedWorkPackage => {
+            relatedWorkPackage.relatedBy = relations[relatedWorkPackage.id];
+            this.currentRelations = relatedWorkPackages;
+          });
+        }
+        else {
+          relatedWorkPackages.relatedBy = relations[relatedWorkPackages.id];
+          this.currentRelations[0] = relatedWorkPackages;
+        }
 
-        this.currentRelations = relatedWorkPackages;
         this.buildRelationGroups();
       });
   }

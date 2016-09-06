@@ -2,7 +2,7 @@
     <div class="grid-block v-align hierarchy-item" ng-if="!$ctrl.showEditForm && $ctrl.relatedType !== 'parent' && $ctrl.relatedWorkPackage">
         <div class="grid-content medium-6 collapse">
             <span ng-style="{'padding-left': $ctrl.indentBy + 'px'}">
-                <a href="{{$ctrl.relatedWorkPackage.$links.activities}}">{{$ctrl.getFullIdentifier()}}</a>
+                <a href="{{$ctrl.workPackagePath($ctrl.relatedWorkPackage.id)}}">{{$ctrl.getFullIdentifier()}}</a>
             </span>
         </div>
         <div class="grid-content medium-4 collapse" style="margin-left:2px;">
@@ -31,18 +31,10 @@
         </div>
     </div>
 
-    <div class="grid-block hierarchy-item" ng-if="$ctrl.showEditForm">
-        <div class="grid-content medium-12 collapse">
-            <wp-relations-create
-                    work-package="$ctrl.relatedWorkPackage"
-                    template="add-fixed-type"
-                    fixed-relation-type="parent"
-                    external-form-toggle="$ctrl.showEditForm"></wp-relations-create>
-        </div>
-    </div>
-    <div ng-if="$ctrl.relationType === 'parent' && !$ctrl.relatedWorkPackage">
+    <div ng-if="($ctrl.relationType === 'parent' && !$ctrl.relatedWorkPackage) || $ctrl.showEditForm">
         <wp-relations-create template="empty-parents"
                              fixed-relation-type="parent"
+                             external-form-toggle="$ctrl.showEditForm"
                              work-package="$ctrl.workPackage"></wp-relations-create>
     </div>
 </div>

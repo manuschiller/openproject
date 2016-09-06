@@ -24,17 +24,17 @@
                     selected-wp-id="$relationsCreateCtrl.selectedWpId"
                     selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
         </div>
-        <div class="grid-content medium-2 collapse" style="text-align: right;">
+        <div class="grid-content medium-2 collapse" style="line-height: 1.5em; text-align: right;">
             <accessible-by-keyboard
                     execute="$relationsCreateCtrl.createRelation()">
                 <icon-wrapper icon-name="checkmark"
-                              icon-title="'remove relation'">
+                              icon-title="'save child relation'">
                 </icon-wrapper>
             </accessible-by-keyboard>
             <accessible-by-keyboard
                     execute="$relationsCreateCtrl.toggleRelationsCreateForm()">
                 <icon-wrapper icon-name="remove"
-                              icon-title="'remove relation'">
+                              icon-title="'abort'">
                 </icon-wrapper>
             </accessible-by-keyboard>
         </div>

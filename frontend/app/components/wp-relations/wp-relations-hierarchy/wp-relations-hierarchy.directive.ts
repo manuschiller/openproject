@@ -36,8 +36,13 @@ export class WorkPackageRelationsHierarchyController {
   public children = [];
   public workPackage:RelatedWorkPackage;
   public showEditForm:boolean = false;
+  public workPackagePath = this.PathHelper.workPackagePath;
 
-  constructor(protected $scope, protected $q:ng.IQService, protected wpCacheService) {
+  constructor(protected $scope,
+              protected $rootScope,
+              protected $q:ng.IQService,
+              protected PathHelper,
+              protected wpCacheService) {
     // TODO: refactor to using wpCacheService instead of $q
 
     this.registerEventListeners();
@@ -49,6 +54,7 @@ export class WorkPackageRelationsHierarchyController {
         this.parent = parent;
       });
     }
+    // move to wpcacheservice
     if (this.workPackage.children) {
       let relatedChildrenPromises = [];
 
@@ -59,16 +65,14 @@ export class WorkPackageRelationsHierarchyController {
 
   }
 
-  public removeParentRelation() {
-    this.workPackage.changeParent(null).then(res => console.log(res));
-  }
-
   protected removedChild(evt, workPackage) {
     _.remove(this.children, {'id' : workPackage.id});
+    this.$rootScope.$emit('workPackagesRefreshInBackground');
   }
 
   protected addedChild(evt, addedChildWorkPackage) {
     this.children.push(addedChildWorkPackage);
+    this.$rootScope.$emit('workPackagesRefreshInBackground');
   }
 
   private registerEventListeners() {
@@ -83,8 +87,10 @@ export class WorkPackageRelationsHierarchyController {
         .take(1)
         .subscribe((parent:WorkPackageResourceInterface) => {
           this.parent = parent;
+          this.$rootScope.$emit('workPackagesRefreshInBackground');
         });
     } else {
+      this.$rootScope.$emit('workPackagesRefreshInBackground');
       this.parent = null;
     }
     this.workPackage = changedData.updatedWp;

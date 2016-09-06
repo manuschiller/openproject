@@ -36,22 +36,23 @@ export class WorkPackageRelationsController {
   public relationGroups:RelatedWorkPackagesGroup = [];
   public workPackage:WorkPackageResourceInterface;
 
-  protected currentRelations = Array<RelatedWorkPackage>;
+  public currentRelations = Array<RelatedWorkPackage>;
 
   constructor(protected $scope:ng.IScope,
               protected $q:ng.IQService,
               protected wpCacheService:WorkPackageCacheService) {
 
     this.registerEventListeners();
-
-    if (!this.workPackage.relations.$loaded) {
-      this.workPackage.relations.$load().then(relations => {
+    
+    if(this.workPackage.relations && this.workPackage.relations.count > 0) {
+      if (!this.workPackage.relations.$loaded) {
+        this.workPackage.relations.$load().then(relations => {
+          this.loadRelations();
+        });
+      } else {
         this.loadRelations();
-      });
-    } else {
-      this.loadRelations();
+      }
     }
-
   }
 
   protected removeSingleRelation(evt, relation) {
@@ -69,6 +70,7 @@ export class WorkPackageRelationsController {
     });
 
     if (observablesToGetZipped.length > 1) {
+      console.log('observablesToGetZipped', observablesToGetZipped);
       return Rx.Observable
         .zip(observablesToGetZipped)
         .take(1);
@@ -96,7 +98,7 @@ export class WorkPackageRelationsController {
 
   protected addSingleRelation(evt, relation) {
     var relatedWorkPackageId = [this.getRelatedWorkPackageId(relation)];
-    this.getRelatedWorkPackages(relatedWorkPackageId).subscribe((relatedWorkPackage:RelatedWorkPackage) => {
+    this.getRelatedWorkPackages(relatedWorkPackageId).take(1).subscribe((relatedWorkPackage:RelatedWorkPackage) => {
       relatedWorkPackage.relatedBy = relation;
       this.currentRelations.push(relatedWorkPackage);
       this.buildRelationGroups();

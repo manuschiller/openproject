@@ -15,6 +15,11 @@ class WpRelationRowDirectiveController {
   public showRelationControls:boolean;
   public showRelationInfo:boolean = false;
 
+  public userInputs = {
+    description: this.relatedWorkPackage.relatedBy.description,
+    showDescriptionEditForm: false
+  };
+
   constructor(protected $scope,
               protected $element,
               protected wpCacheService,
@@ -22,14 +27,32 @@ class WpRelationRowDirectiveController {
               protected wpNotificationsService,
               protected WpRelationsService) {
     if (this.relatedWorkPackage.relatedBy) {
-      console.log('relatedBy', this.relatedWorkPackage.relatedBy);
       var relationType = _.find(this.WpRelationsService.configuration.relationTypes, {'type' : this.relatedWorkPackage.relatedBy._type});
       this.relationType = angular.isDefined(relationType) ? this.WpRelationsService.configuration.relationTitles[relationType.name] : 'unknown';
     }
+
     this.wpForm = this.relatedWorkPackage;
   };
 
+  public toggleUserDescriptionForm() {
+    this.userInputs.showDescriptionEditForm = !this.userInputs.showDescriptionEditForm;
+  }
 
+  public getDescription() {
+    return this.relatedWorkPackage.relatedBy.description;
+  }
+
+  public updateRelationDescription() {
+    this.relatedWorkPackage.relatedBy.updateRelation({
+      description: this.userInputs.description,
+      relation_type: 'blocks'
+    }).then(() => {
+      this.relatedWorkPackage.relatedBy.description = this.userInputs.description;
+    })
+    .finally(() => {
+      this.toggleUserDescriptionForm();
+    });
+  }
 
   public getFullIdentifier(hideType?:boolean) {
     var type = ' ';

@@ -10,6 +10,7 @@ export class WpRelationsCreateController {
   public externalFormToggle: boolean;
   public fixedRelationType:string;
   public relationTypes = this.WpRelationsService.configuration.relationTypes;
+  public relatedWorkPackages;
   protected relationTitles = this.WpRelationsService.configuration.relationTitles;
 
   constructor(protected $scope,
@@ -124,7 +125,8 @@ function wpRelationsCreate() {
     scope: {
       workPackage: '=?',
       fixedRelationType: '@?',
-      externalFormToggle: '=?'
+      externalFormToggle: '=?',
+      relatedWorkPackages: '='
     },
 
     controller: WpRelationsCreateController,

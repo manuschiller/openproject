@@ -78,10 +78,11 @@ module API
               Relation.destroy(params[:relation_id])
               status 204
             end
-            update do
+
+            patch do
               authorize(:manage_work_package_relations, context: @work_package.project)
-              Relation.update(params[:relation_id])
-              status 200
+              Relation.update(params[:relation_id], :description => params[:description]) if params[:description].present?
+              Relation.update(params[:relation_id], :relation_type => params[:relation_type]) if params[:relation_type].present?
             end
           end
         end

@@ -32,9 +32,28 @@
             </accessible-by-keyboard>
         </div>
     </div>
-    <div class="grid-block hierarchy-item" style="border: 1px dotted lightblue; padding:4px;" ng-show="$ctrl.showRelationInfo">
-        <div class="grid-content medium-12 collapse">
-            This is a description for the relation to #{{$ctrl.relatedWorkPackage.id}} {{ $ctrl.relatedWorkPackage.subject }}
+    <div class="grid-block hierarchy-item" style="border: 1px dotted lightblue; padding:4px;" ng-show="$ctrl.showRelationInfo" ng-init="editDescription = false">
+        <div class="grid-content medium-10 collapse">
+            <div ng-if="!editDescription">
+                {{$ctrl.relatedWorkPackage.relatedBy.description}}
+            </div>
+            <div ng-if="editDescription">
+                <textarea>test</textarea>
+            </div>
+        </div>
+        <div class="grid-content medium-2 collapse" style="text-align: right" ng-if="!editDescription">
+            <accessible-by-keyboard execute="editDescription = true">
+                <icon-wrapper icon-name="edit"
+                              icon-title="'edit description'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+        </div>
+        <div class="grid-content medium-2 collapse" style="text-align: right" ng-if="editDescription">
+            <accessible-by-keyboard execute="editDescription = false">
+                <icon-wrapper icon-name="remove"
+                              icon-title="'edit description'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
         </div>
 
     </div>

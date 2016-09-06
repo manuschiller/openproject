@@ -69,6 +69,8 @@ module API
 
         property :delay, render_nil: true, if: -> (*) { relation_type == 'precedes' }
 
+        property :description, getter: -> (*) { description }
+
         def _type
           "Relation::#{relation_type}"
         end

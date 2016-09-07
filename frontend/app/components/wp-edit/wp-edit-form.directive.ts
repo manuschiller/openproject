@@ -114,9 +114,7 @@ export class WorkPackageEditFormController {
    * without saving the resource.
    */
   public updateForm() {
-    console.log('update form');
     this.workPackage.updateForm(this.workPackage.$source).then(() => {
-      console.log('update form done');
       this.wpCacheService.updateWorkPackage(this.workPackage);
     });
   }

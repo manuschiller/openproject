@@ -7,7 +7,7 @@ import {
 
 class WpRelationRowDirectiveController {
   public relatedWorkPackage;
-  public relationType;
+  public relationType:string;
 
   public showRelationControls:boolean;
   public showRelationInfo:boolean = false;
@@ -17,7 +17,7 @@ class WpRelationRowDirectiveController {
     showDescriptionEditForm: false
   };
 
-  constructor(protected $scope,
+  constructor(protected $scope:ng.IScope,
               protected $element,
               protected wpCacheService,
               protected PathHelper,

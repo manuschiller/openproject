@@ -216,10 +216,6 @@ export class WorkPackageEditFieldController {
   }
 
   public handleUserActivate() {
-    console.log('field', this.field);
-    console.log('wp', this.workPackage);
-    console.log('this', this);
-
     this.activate(true).then((active) => {
       // Display a generic error if the field turns out not to be editable,
       // despite the field being editable.

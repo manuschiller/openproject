@@ -27,103 +27,111 @@
 //++
 
 import {wpTabsModule} from '../../angular-modules';
-import {WorkPackageRelationGroup} from './wp-relation-group/wp-relation-group.service';
-import {WorkPackageNotificationService} from '../wp-edit/wp-notification.service';
-import {WorkPackageResource} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {RelatedWorkPackage, RelatedWorkPackagesGroup} from './wp-relations.interfaces';
 
-const iconArrowClasses = ['icon-arrow-up1', 'icon-arrow-down1'];
+import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {WorkPackageCacheService} from '../work-packages/work-package-cache.service';
 
 export class WorkPackageRelationsController {
-  public btnTitle:string;
-  public btnIcon:string = '<i class="icon-hierarchy icon-add"></i>';
+  public relationGroups:RelatedWorkPackagesGroup = [];
+  public workPackage:WorkPackageResourceInterface;
 
-  public workPackage:WorkPackageResource;
-  public relationGroup:WorkPackageRelationGroup;
-  public focusElementIndex:number = -2;
-  public wpToAddId:number = null;
-  public expand:boolean = false;
-  public text:any;
+  public currentRelations: Array<RelatedWorkPackage> = [];
 
-  private _initialExpand:boolean;
+  constructor(protected $scope:ng.IScope,
+              protected $q:ng.IQService,
+              protected wpCacheService:WorkPackageCacheService) {
 
-  public get stateClass():string {
-    return iconArrowClasses[+!!this.expand];
-  }
+    this.registerEventListeners();
 
-  public get groupExpanded() {
-    if (angular.isUndefined(this._initialExpand) && !this.relationGroup.isEmpty) {
-      this._initialExpand = this.expand = !this.relationGroup.isEmpty;
-    }
-    return this.expand;
-  }
-
-  constructor(protected $scope,
-              protected I18n,
-              protected wpNotificationsService:WorkPackageNotificationService,
-              protected NotificationsService) {
-    this.text = {
-      title: I18n.t('js.relation_labels.' + this.relationGroup.id),
-      table: {
-        subject: I18n.t('js.work_packages.properties.subject'),
-        status: I18n.t('js.work_packages.properties.status'),
-        assignee: I18n.t('js.work_packages.properties.assignee')
-      },
-      relations: {
-        empty: I18n.t('js.relations.empty'),
-        remove: I18n.t('js.relations.remove')
+    if (this.workPackage.relations && this.workPackage.relations.count > 0) {
+      if (!this.workPackage.relations.$loaded) {
+        this.workPackage.relations.$load().then(relations => {
+          this.loadRelations();
+        });
+      } else {
+        this.loadRelations();
       }
-    };
-
-    if (this.relationGroup.id === 'parent') {
-      this.btnIcon = '<i class="icon-hierarchy icon-edit"></i>';
     }
   }
 
-  public addRelation() {
-    this.relationGroup.addWpRelation(this.wpToAddId)
-      .then(() => {
-        this.wpToAddId = null;
-        this.handleSuccess(-1);
-      })
-      .catch(error => this.wpNotificationsService.handleErrorResponse(error, this.workPackage));
+  protected removeSingleRelation(evt, relation) {
+    this.currentRelations = _.remove(this.currentRelations, (latestRelation) => {
+      return latestRelation.relatedBy.href !== relation.href;
+    });
+    this.buildRelationGroups();
   }
 
-  public canRemoveRelation(relation?):boolean {
-    return this.relationGroup.canRemoveRelation(relation);
-  }
 
-  public removeRelation(relation) {
-    this.relationGroup.removeWpRelation(relation)
-      .then(index => {
-        this.handleSuccess(index);
-      })
-      .catch(error => this.wpNotificationsService.handleErrorResponse(error, this.workPackage));
-  }
+  protected getRelatedWorkPackages(workPackageIds:Array<String>) {
+    let observablesToGetZipped = [];
+    workPackageIds.forEach(wpId => {
+      observablesToGetZipped.push(this.wpCacheService.loadWorkPackage(parseInt(wpId)));
+    });
 
-  public toggleExpand() {
-    this.expand = !this.expand;
-  }
-
-  public isFocused(index:number) {
-    return index === this.focusElementIndex;
-  }
-
-  public updateFocus(index:number) {
-    var length = this.relationGroup.relations.length;
-
-    if (length == 0) {
-      this.focusElementIndex = -1;
+    if (observablesToGetZipped.length > 1) {
+      return Rx.Observable
+        .zip(observablesToGetZipped)
+        .take(1);
+    } else {
+      return observablesToGetZipped[0].take(1);
     }
-    else {
-      this.focusElementIndex = (index < length) ? index : length - 1;
-    }
-
-    this.$scope.$evalAsync(() => this.$scope.$broadcast('updateFocus'));
   }
 
-  private handleSuccess(index) {
-    this.updateFocus(index);
-    this.$scope.$emit('workPackagesRefreshInBackground');
+  protected getRelatedWorkPackageId(relation):string {
+    if (relation.relatedTo.href === this.workPackage.href) {
+      return relation.relatedFrom.href.split('/').pop();
+    } else {
+      return relation.relatedTo.href.split('/').pop();
+    }
+  }
+
+  protected buildRelationGroups() {
+    if (angular.isDefined(this.currentRelations)) {
+      this.relationGroups = (_.groupBy(this.currentRelations, (wp) => {
+        return wp.type.name;
+      }) as Array);
+    }
+  }
+
+  protected addSingleRelation(evt, relation) {
+    var relatedWorkPackageId = [this.getRelatedWorkPackageId(relation)];
+    this.getRelatedWorkPackages(relatedWorkPackageId).take(1).subscribe((relatedWorkPackage:RelatedWorkPackage) => {
+      relatedWorkPackage.relatedBy = relation;
+      this.currentRelations.push(relatedWorkPackage);
+      this.buildRelationGroups();
+    });
+  }
+
+  protected loadRelations():void {
+    var relatedWpIds = [];
+    var relations = [];
+
+    this.workPackage.relations.elements.forEach(relation => {
+      relatedWpIds.push(this.getRelatedWorkPackageId(relation));
+      relations[this.getRelatedWorkPackageId(relation)] = relation;
+    });
+
+    this.getRelatedWorkPackages(relatedWpIds)
+      .subscribe(relatedWorkPackages => {
+        if(angular.isArray(relatedWorkPackages)){
+          relatedWorkPackages.forEach(relatedWorkPackage => {
+            relatedWorkPackage.relatedBy = relations[relatedWorkPackage.id];
+            this.currentRelations = relatedWorkPackages;
+          });
+        }
+        else {
+          relatedWorkPackages.relatedBy = relations[relatedWorkPackages.id];
+          this.currentRelations[0] = relatedWorkPackages;
+        }
+
+        this.buildRelationGroups();
+      });
+  }
+
+  private registerEventListeners() {
+    this.$scope.$on('wp-relations.added', this.addSingleRelation.bind(this));
+    this.$scope.$on('wp-relations.removed', this.removeSingleRelation.bind(this));
   }
 }
 
@@ -131,17 +139,15 @@ function wpRelationsDirective() {
   return {
     restrict: 'E',
     replace: true,
-    templateUrl: '/components/wp-relations/wp-relations.directive.html',
+    templateUrl: '/components/wp-relations/wp-relations.template.html',
 
     scope: {
-      relationGroup: '=',
-      workPackage: '=',
-      btnTitle: '=buttonTitle',
+      workPackage: '='
     },
 
     controller: WorkPackageRelationsController,
     controllerAs: '$ctrl',
-    bindToController: true,
+    bindToController: true
   };
 }
 

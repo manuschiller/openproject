@@ -1,61 +1,70 @@
-//-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License version 3.
-//
-// OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
-// Copyright (C) 2006-2013 Jean-Philippe Lang
-// Copyright (C) 2010-2013 the ChiliProject Team
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-//
-// See doc/COPYRIGHT.rdoc for more details.
-//++
+import {wpTabsModule} from '../../../angular-modules';
+import {
+  WorkPackageResource,
+  WorkPackageResourceInterface
+} from '../../api/api-v3/hal-resources/work-package-resource.service';
 
-import {wpTabsModule} from "../../../angular-modules";
-import {WorkPackageRelationsController} from "../wp-relations.directive";
 
-function wpRelationRowDirective(PathHelper) {
-  var getFullIdentifier = (workPackage) => {
-    var type = ' ';
+class WpRelationRowDirectiveController {
+  public relatedWorkPackage;
+  public relationType;
 
-    if (workPackage.type) {
-      type += workPackage.type.name + ': ';
-    }
+  public showRelationControls:boolean;
+  public showRelationInfo:boolean = false;
 
-    return `#${workPackage.id}${type}${workPackage.subject}`;
+  public userInputs = {
+    description: this.relatedWorkPackage.relatedBy.description,
+    showDescriptionEditForm: false
   };
 
-  function wpRelationsDirectiveLink(scope) {
-    scope.workPackagePath = PathHelper.workPackagePath;
-    scope.userPath = PathHelper.userPath;
+  constructor(protected $scope,
+              protected $element,
+              protected wpCacheService,
+              protected PathHelper,
+              protected wpNotificationsService,
+              protected WpRelationsService) {
+    if (this.relatedWorkPackage.relatedBy) {
+      var relationType = this.WpRelationsService.getRelationTypeObjectByType(this.relatedWorkPackage.relatedBy._type);
+      this.relationType = angular.isDefined(relationType) ? this.WpRelationsService.getTranslatedRelationTitle[relationType.name] : 'unknown';
+    }
+  };
 
-    scope.$ctrl.relationGroup.getRelatedWorkPackage(scope.relation)
-      .then(relatedWorkPackage => {
-        scope.relatedWorkPackage = relatedWorkPackage;
-        scope.fullIdentifier = getFullIdentifier(relatedWorkPackage);
-        scope.state = relatedWorkPackage.status.isClosed ? 'closed' : '';
-      });
+  public toggleUserDescriptionForm() {
+    this.userInputs.showDescriptionEditForm = !this.userInputs.showDescriptionEditForm;
   }
 
+  public updateRelationDescription() {
+    this.WpRelationsService.changeRelationDescription(this.relatedWorkPackage.relatedBy, this.userInputs.description)
+      .then(() => {
+        this.relatedWorkPackage.relatedBy.description = this.userInputs.description;
+      })
+      .catch(err => console.log(err))
+      .finally(this.toggleUserDescriptionForm());
+  }
+
+  public removeRelation() {
+    const relation = this.relatedWorkPackage.relatedBy;
+    this.WpRelationsService.removeCommonRelation(relation).then(() => {
+      this.$scope.$emit('wp-relations.removed', relation);
+      // TODO: WpRelationsService.handleSuccess()
+      this.wpNotificationsService.showSave(this.relatedWorkPackage);
+      this.wpCacheService.updateWorkPackage([this.relatedWorkPackage]);
+    });
+  }
+}
+
+function WpRelationRowDirective() {
   return {
-    restrict: 'A',
-    link: wpRelationsDirectiveLink
+    restrict: 'E',
+    templateUrl: '/components/wp-relations/wp-relation-row/wp-relation-row.template.html',
+    replace: true,
+    scope: {
+      relatedWorkPackage: '='
+    },
+    controller: WpRelationRowDirectiveController,
+    controllerAs: '$ctrl',
+    bindToController: true
   };
 }
 
-wpTabsModule.directive('wpRelationRow', wpRelationRowDirective);
+wpTabsModule.directive('wpRelationRow', WpRelationRowDirective);

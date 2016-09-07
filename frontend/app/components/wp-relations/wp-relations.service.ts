@@ -29,48 +29,121 @@
 import {wpTabsModule} from '../../angular-modules';
 import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
 
-export interface WorkPackageRelationsConfigInterface {
-  name:string;
-  type:string;
-  id?:string;
-}
+
 
 export class WorkPackageRelationsService {
-  private relationsConfig:WorkPackageRelationsConfigInterface[] = [
-    {name: 'parent', type: 'parent'},
-    {name: 'children', type: 'children'},
-    {name: 'relatedTo', type: 'Relation::Relates', id: 'relates'},
-    {name: 'duplicates', type: 'Relation::Duplicates'},
-    {name: 'duplicated', type: 'Relation::Duplicated'},
-    {name: 'blocks', type: 'Relation::Blocks'},
-    {name: 'blocked', type: 'Relation::Blocked'},
-    {name: 'precedes', type: 'Relation::Precedes'},
-    {name: 'follows', type: 'Relation::Follows'}
-  ];
+  constructor(protected $rootScope,
+              protected $q,
+              protected $state,
+              protected I18n,
+              protected wpCacheService,
+              protected wpNotificationsService) {
 
-  constructor(protected WorkPackageRelationGroup,
-              protected WorkPackageParentRelationGroup,
-              protected WorkPackageChildRelationsGroup) {
   }
 
-  public getWpRelationGroups(workPackage:WorkPackageResourceInterface) {
-    let configsOfInterest = this.relationsConfig;
 
-    if (workPackage.isMilestone) {
-      configsOfInterest = _.reject(configsOfInterest, {name: 'children'});
+
+  public addCommonRelation(workPackage, relationType, relatedWpId) {
+    const params = {
+      to_id: relatedWpId,
+      relation_type: relationType
+    };
+
+    workPackage.addRelation(params);
+  }
+
+  public changeRelationDescription(relation, description) {
+    const params = {
+      description: description
+    };
+    return relation.updateRelation(params);
+  }
+
+  public changeRelationType(relation, relationType) {
+    const params = {
+      relation_type: relationType
+    };
+    return relation.updateRelation(params);
+  }
+
+  public removeCommonRelation(relation, workPackage) {
+    return relation.remove();
+  }
+
+  public handleSuccess(successMessage:string, dataToEmit, updatedWorkPackage?:WorkPackageResourceInterface) {
+    this.$rootScope.$emit(successMessage, dataToEmit);
+    this.wpNotificationsService.showSave(updatedWorkPackage);
+  }
+
+  public handleError(error, workPackage?) {
+
+  }
+
+  public getTranslatedRelationTitle(relationTypeName:string) {
+    return this.configuration.relationTitles[relationTypeName];
+  }
+
+  public getRelationTypeObjectByType(type:string) {
+    return _.find(this.configuration.relationTypes, {type: type});
+  }
+
+  public getRelationTypeObjectByName(name:string) {
+    return _.find(this.configuration.relationTypes, {name: name});
+  }
+
+  public getRelationTitles(rejectParentChild?:boolean) {
+    let relationTitles = angular.copy(this.configuration.relationTitles);
+    if (rejectParentChild) {
+      _.remove(relationTitles, (relationTitleValue, relationTitleKey) => {
+        return relationTitleKey === 'parent' || relationTitleKey === 'children';
+      });
     }
-
-    return configsOfInterest.map(config => {
-      switch (config.type) {
-        case 'parent':
-          return new this.WorkPackageParentRelationGroup(workPackage, config);
-        case 'children':
-          return new this.WorkPackageChildRelationsGroup(workPackage, config);
-        default:
-          return new this.WorkPackageRelationGroup(workPackage, config);
-      }
-    });
+    return relationTitles;
   }
+
+  public getRelationTypes(rejectParentChild?:boolean) {
+
+    let relationTypes = angular.copy(this.configuration.relationTypes);
+    if (rejectParentChild) {
+      _.remove(relationTypes, (relationType) => {
+        return relationType.name === 'parent' || relationType.name === 'children';
+      });
+    }
+    return relationTypes;
+  }
+
+  public configuration = {
+    relationTitles: {
+      parent: this.I18n.t('js.relation_labels.parent'),
+      children: this.I18n.t('js.relation_labels.children'),
+      relatedTo: this.I18n.t('js.relation_labels.relates'),
+      duplicates: this.I18n.t('js.relation_labels.duplicates'),
+      duplicated: this.I18n.t('js.relation_labels.duplicated'),
+      blocks: this.I18n.t('js.relation_labels.blocks'),
+      blocked: this.I18n.t('js.relation_labels.blocked'),
+      precedes: this.I18n.t('js.relation_labels.precedes'),
+      follows: this.I18n.t('js.relation_labels.follows'),
+      includes: this.I18n.t('js.relation_labels.includes'),
+      partof: this.I18n.t('js.relation_labels.part_of'),
+      requires: this.I18n.t('js.relation_labels.requires'),
+      required: this.I18n.t('js.relation_labels.required_by')
+    },
+    relationTypes: [
+      {name: 'parent', type: 'parent'},
+      {name: 'children', type: 'children'},
+      {name: 'relatedTo', type: 'Relation::Relates', id: 'relates'},
+      {name: 'duplicates', type: 'Relation::Duplicates'},
+      {name: 'duplicated', type: 'Relation::Duplicated'},
+      {name: 'blocks', type: 'Relation::Blocks'},
+      {name: 'blocked', type: 'Relation::Blocked'},
+      {name: 'precedes', type: 'Relation::Precedes'},
+      {name: 'follows', type: 'Relation::Follows'},
+      {name: 'includes', type: 'Relation::Includes'},
+      {name: 'partof', type: 'Relation::Partof'},
+      {name: 'requires', type: 'Relation::Requires'},
+      {name: 'required', type: 'Relation::Required'}
+    ]
+  };
 }
 
-wpTabsModule.service('wpRelations', WorkPackageRelationsService);
+wpTabsModule.service('WpRelationsService', WorkPackageRelationsService);

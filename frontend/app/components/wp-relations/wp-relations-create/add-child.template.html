@@ -1,0 +1,47 @@
+<div>
+
+    <!-- TODO: MOVE STYLE ATTR TO CLASS -->
+    <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
+        <div class="grid-block">
+            <div class="grid-content collapse">
+                <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.createNewChildWorkPackage()">
+                    <i class="icon icon-add"></i>
+                    <span>Create new child work package</span>
+                </a>
+            </div>
+            <div class="grid-content collapse">
+                <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                    <i class="icon icon-add"></i>
+                    <span>Add existing child work package</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="grid-block v-align" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
+        <div class="grid-content medium-10">
+            <wp-relations-autocomplete
+                    work-package="$relationsCreateCtrl.workPackage"
+                    selected-wp-id="$relationsCreateCtrl.selectedWpId"
+                    selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
+        </div>
+        <div class="grid-content medium-2 collapse" style="line-height: 1.5em; text-align: right;">
+            <accessible-by-keyboard
+                    execute="$relationsCreateCtrl.createRelation()">
+                <icon-wrapper icon-name="checkmark"
+                              icon-title="'save child relation'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+            <accessible-by-keyboard
+                    execute="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                <icon-wrapper icon-name="remove"
+                              icon-title="'abort'">
+                </icon-wrapper>
+            </accessible-by-keyboard>
+        </div>
+    </div>
+
+</div>
+
+
+
+

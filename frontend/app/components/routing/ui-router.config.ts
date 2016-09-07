@@ -59,17 +59,6 @@ const panels = {
     activity.url = '#{activity_no:\d+}';
 
     return activity;
-  },
-
-  get relations() {
-    return {
-      url: '/relations',
-      reloadOnSearch: false,
-      template: ` <relations-panel
-                    ng-if="$ctrl.workPackage"
-                    work-package="$ctrl.workPackage"
-                  ></relations-panel>`
-    };
   }
 };
 
@@ -163,7 +152,6 @@ openprojectModule
       })
       .state('work-packages.show.activity', panels.activity)
       .state('work-packages.show.activity.details', panels.activityDetails)
-      .state('work-packages.show.relations', panels.relations)
       .state('work-packages.show.watchers', panels.watchers)
 
       .state('work-packages.list', {
@@ -212,7 +200,6 @@ openprojectModule
       .state('work-packages.list.details.overview', panels.overview)
       .state('work-packages.list.details.activity', panels.activity)
       .state('work-packages.list.details.activity.details', panels.activityDetails)
-      .state('work-packages.list.details.relations', panels.relations)
       .state('work-packages.list.details.watchers', panels.watchers);
   })
 

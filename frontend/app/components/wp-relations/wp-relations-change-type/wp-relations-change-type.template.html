@@ -1,0 +1,10 @@
+<div ng-blur=""$ctrl.editType = false">
+    <span ng-if="!$ctrl.editType">
+        <a ng-click="$ctrl.editType = true">{{::$ctrl.getRelationTitle()}}</a>
+    </span>
+    <select style="padding:3px; height: 1.5em; margin-right: 3px;" class="relationTypeSelect" ng-if="$ctrl.editType"
+            ng-change="$ctrl.changeRelationType()"
+            ng-model="$ctrl.selectedRelationType"
+            ng-options="$ctrl.relationTitles[relationType.name] for relationType in $ctrl.relationTypes">
+    </select>
+</div>

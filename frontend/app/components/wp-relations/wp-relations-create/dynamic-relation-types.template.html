@@ -1,0 +1,49 @@
+<div>
+
+        <!-- TODO: MOVE STYLE ATTR TO CLASS -->
+        <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
+            <div class="grid-block">
+                <div class="grid-content collapse">
+                    <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                        <i class="icon icon-add"></i>
+                        <span>Create new relation</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="grid-block v-align" ng-if="$relationsCreateCtrl.showRelationsCreateForm">
+            <div class="grid-content collapse medium-3">
+                <select
+                        class="relationTypeSelect"
+                        ng-model="$relationsCreateCtrl.selectedRelationType"
+                        ng-options="$relationsCreateCtrl.relationTitles[relationType.name] for relationType in $relationsCreateCtrl.relationTypes">
+                </select>
+            </div>
+            <div class="grid-content medium-7">
+                <wp-relations-autocomplete
+                        related-work-packages="$relationsCreateCtrl.relatedWorkPackages"
+                        work-package="$relationsCreateCtrl.workPackage"
+                        selected-wp-id="$relationsCreateCtrl.selectedWpId"
+                        selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
+            </div>
+            <div class="grid-content medium-2 collapse" style="line-height: 1.5em; text-align: right;">
+                <accessible-by-keyboard
+                                        execute="$relationsCreateCtrl.createRelation()">
+                    <icon-wrapper icon-name="checkmark"
+                                  icon-title="'remove relation'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+                <accessible-by-keyboard
+                                        execute="$relationsCreateCtrl.toggleRelationsCreateForm()">
+                    <icon-wrapper icon-name="remove"
+                                  icon-title="'remove relation'">
+                    </icon-wrapper>
+                </accessible-by-keyboard>
+            </div>
+        </div>
+
+</div>
+
+
+
+

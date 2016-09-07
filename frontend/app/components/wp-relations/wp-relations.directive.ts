@@ -44,7 +44,7 @@ export class WorkPackageRelationsController {
 
     this.registerEventListeners();
 
-    if (this.workPackage.relations && this.workPackage.relations.count > 0) {
+    if (this.workPackage.relations && (this.workPackage.relations as any).count > 0) {
       if (!this.workPackage.relations.$loaded) {
         this.workPackage.relations.$load().then(relations => {
           this.loadRelations();
@@ -108,13 +108,14 @@ export class WorkPackageRelationsController {
     var relations = [];
 
     this.workPackage.relations.elements.forEach(relation => {
-      relatedWpIds.push(this.getRelatedWorkPackageId(relation));
-      relations[this.getRelatedWorkPackageId(relation)] = relation;
+      const relatedWpId = this.getRelatedWorkPackageId(relation)
+      relatedWpIds.push(relatedWpId);
+      relations[relatedWpId] = relation;
     });
 
     this.getRelatedWorkPackages(relatedWpIds)
       .subscribe(relatedWorkPackages => {
-        if(angular.isArray(relatedWorkPackages)){
+        if(angular.isArray(relatedWorkPackages)) {
           relatedWorkPackages.forEach(relatedWorkPackage => {
             relatedWorkPackage.relatedBy = relations[relatedWorkPackage.id];
             this.currentRelations = relatedWorkPackages;

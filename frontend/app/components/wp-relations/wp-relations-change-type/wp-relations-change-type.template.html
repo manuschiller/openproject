@@ -1,8 +1,9 @@
-<div ng-blur=""$ctrl.editType = false">
+<div ng-blur=""$ctrl.editType = false" style="padding-right: 7px;">
     <span ng-if="!$ctrl.editType">
         <a ng-click="$ctrl.editType = true">{{::$ctrl.getRelationTitle()}}</a>
     </span>
-    <select style="padding:3px; height: 1.5em; margin-right: 3px;" class="relationTypeSelect" ng-if="$ctrl.editType"
+    <select style="padding:3px; height: 1.5em; margin-right: 3px; line-height: 1em;" class="relationTypeSelect wp-inline-edit--field form--select" ng-if="$ctrl.editType"
+            ng-keyup="$ctrl.abortRelationTypeChange($event.keyCode)"
             ng-change="$ctrl.changeRelationType()"
             ng-model="$ctrl.selectedRelationType"
             ng-options="$ctrl.relationTitles[relationType.name] for relationType in $ctrl.relationTypes">

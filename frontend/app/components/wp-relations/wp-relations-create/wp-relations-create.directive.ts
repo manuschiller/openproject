@@ -30,6 +30,11 @@ export class WpRelationsCreateController {
   }
 
   public createRelation() {
+
+    if(!this.selectedRelationType || ! this.selectedWpId){
+      return;
+    }
+
     switch (this.selectedRelationType.name) {
       case 'parent':
         this.changeParent();
@@ -104,8 +109,7 @@ function wpRelationsCreate() {
     scope: {
       workPackage: '=?',
       fixedRelationType: '@?',
-      externalFormToggle: '=?',
-      relatedWorkPackages: '='
+      externalFormToggle: '=?'
     },
 
     controller: WpRelationsCreateController,

@@ -9,6 +9,7 @@ class WpRelationsHierarchyRowDirectiveController {
   public workPackage;
   public relatedWorkPackage;
   public relationType;
+  
   public indentBy;
   public showEditForm: boolean = false;
   public workPackagePath = this.PathHelper.workPackagePath;
@@ -19,7 +20,6 @@ class WpRelationsHierarchyRowDirectiveController {
               protected PathHelper,
               protected wpNotificationsService) {
 
-    // display base wp
     if (!this.relatedWorkPackage && this.relationType !== 'parent') {
       this.relatedWorkPackage = angular.copy(this.workPackage);
     }

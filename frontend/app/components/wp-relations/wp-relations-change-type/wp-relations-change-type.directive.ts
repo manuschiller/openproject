@@ -28,8 +28,7 @@
 
 import {wpTabsModule} from '../../../angular-modules';
 import {RelationResource} from '../wp-relations.interfaces';
-import {WorkPackageResourceInterface} from '../../api/api-v3/hal-resources/work-package-resource.service';
-import {WorkPackageRelationsService} from "../wp-relations.service";
+import {WorkPackageRelationsService} from '../wp-relations.service';
 
 
 export class WorkPackageRelationsChangeTypeController {
@@ -42,8 +41,11 @@ export class WorkPackageRelationsChangeTypeController {
   public editType:boolean;
 
 
-  constructor(protected WpRelationsService:WorkPackageRelationsService) {
+  constructor(protected $element,
+              protected WpRelationsService:WorkPackageRelationsService) {
     this.selectedRelationType = this.WpRelationsService.getRelationTypeObjectByType(this.relation._type);
+    // TODO: I think we already have a solution for key events... 
+    $element.on('keyup', this.handleKeyPress.bind(this));
   }
 
   public changeRelationType() {
@@ -56,6 +58,12 @@ export class WorkPackageRelationsChangeTypeController {
       })
       .catch(err => console.log(err))
       .finally(() => { this.editType = false; });
+  }
+
+  public handleKeyPress(evt) {
+    if (evt.keyCode === 27) {
+      this.editType = false;
+    }
   }
 
   public getRelationTitle() {

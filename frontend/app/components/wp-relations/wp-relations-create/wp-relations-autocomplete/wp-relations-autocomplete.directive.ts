@@ -27,20 +27,20 @@
 //++
 
 import {wpTabsModule} from '../../../../angular-modules';
+import {WorkPackageRelationsController} from "../../wp-relations.directive";
+import {WorkPackageRelationsHierarchyController} from "../../wp-relations-hierarchy/wp-relations-hierarchy.directive";
 
-function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
+function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
   return {
     restrict: 'E',
     templateUrl: '/components/wp-relations/wp-relations-create/wp-relations-autocomplete/wp-relations-autocomplete.template.html',
-    require: ['^wpRelations', '^?wpRelationsHierarchy'],
+    require: ['^wpRelations', '?^wpRelationsHierarchy'],
     scope: {
       selectedWpId: '=',
       selectedRelationType: '=',
-      workPackage: '=',
-      relatedWorkPackages: '='
+      workPackage: '='
     },
     link: function (scope, element, attrs, controllers ) {
-      console.log(controllers);
       scope.relatedWps = [];
       getRelatedWorkPackages();
 
@@ -49,7 +49,7 @@ function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
       };
 
       scope.autocompleteWorkPackages = (term) => {
-        if (!term || !scope.selectedRelationType) {
+        if (!term) {
           return;
         }
 
@@ -87,32 +87,33 @@ function wpRelationsAutocompleteDirective(I18n, $q, PathHelper, $http) {
 
       function getRelatedWorkPackages() {
         /** NOTE: THIS METHOD COULD BE DONE MUCH MORE EFFICIENTLY BY THE BACKEND **/
-        // MEANWHILE REQUIRE THE WP-HIERARCHY AND WP-RELATIONS TO AVOID RELOADING THE WPS
+        const wpRelationsController:WorkPackageRelationsController = controllers[0];
+        const wpRelationsHierarchyController:WorkPackageRelationsHierarchyController = controllers[1];
 
-        var wps = [];
-        if(scope.relatedWorkPackages && scope.relatedWorkPackages.length > 0){
-          scope.relatedWorkPackages.forEach(wp => wps.push(wp.id));
+        let wps = [];
+
+        if (wpRelationsController) {
+          wps = wps.concat(wpRelationsController.currentRelations.map(relation => relation.id));
         }
-
         if (scope.workPackage.parentId) {
           wps.push(scope.workPackage.parentId);
         }
 
-        scope.relatedWps = wps;
-
-        if (scope.workPackage.children) {
-          var childPromises = [];
-          if (scope.workPackage.children.length > 0) {
-            scope.workPackage.children.forEach(child => {
-              childPromises.push(child.$load());
-            });
-            $q.all(childPromises, (children) => {
-              children.forEach(child => wps.push(child.id));
-              scope.relatedWps = wps;
-            });
+        if (wpRelationsHierarchyController) {
+          wps = wps.concat(wpRelationsHierarchyController.children.map(child => child.id));
+        } else {
+          if (scope.workPackage.children) {
+            var childPromises = [];
+            if (scope.workPackage.children.length > 0) {
+              childPromises = childPromises.concat(scope.workPackage.children.map(child => child.$load()));
+              $q.all(childPromises).then(children => {
+                wps = wps.concat(children.map(child => child.id));
+                scope.relatedWps = wps;
+              });
+            }
           }
-
         }
+        scope.relatedWps = wps;
       }
     }
   };

@@ -56,6 +56,10 @@ module OpenProject
       # where to store session data
       'session_store'           => :cache_store,
       'session_cookie_name'     => '_open_project_session',
+      # Destroy all sessions for current_user on logout
+      'drop_old_sessions_on_logout' => true,
+      # Destroy all sessions for current_user on login
+      'drop_old_sessions_on_login' => false,
       # url-path prefix
       'rails_relative_url_root' => '',
       'rails_force_ssl' => false,
@@ -77,8 +81,10 @@ module OpenProject
 
       'disable_password_login' => false,
       'omniauth_direct_login_provider' => nil,
+      'internal_password_confirmation' => true,
 
       'disable_password_choice' => false,
+      'override_bcrypt_cost_factor' => nil,
 
       'disabled_modules' => [], # allow to disable default modules
       'hidden_menu_items' => {},
@@ -313,6 +319,11 @@ module OpenProject
       # @return A ruby object (e.g. Integer, Float, String, Hash, Boolean, etc.)
       # @raise [ArgumentError] If the string could not be parsed.
       def extract_value(key, value)
+
+        # YAML parses '' as false, but empty ENV variables will be passed as that.
+        # To specify specific values, one can use !!str (-> '') or !!null (-> nil)
+        return value if value == ''
+
         YAML.load(value)
       rescue => e
         raise ArgumentError, "Configuration value for '#{key}' is invalid: #{e.message}"

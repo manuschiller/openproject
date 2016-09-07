@@ -80,6 +80,14 @@ openprojectModule
                       .when('/work_packages/{workPackageId:[0-9]+}?query_id&query_props', ($match, $state) => {
                         $state.go('work-packages.show.activity', $match, { location: 'replace' });
                         return true;
+                      })
+                      .when('/work_packages/details/{workPackageId:[0-9]+}?query_id&query_props', ($match, $state) => {
+                        $state.go('work-packages.list.details.overview', $match, { location: 'replace' });
+                        return true;
+                      })
+                      .when('/{projects}/{projectPath}/work_packages/details/{workPackageId:[0-9]+}?query_id&query_props', ($match, $state) => {
+                        $state.go('work-packages.list.details.overview', $match, { location: 'replace' });
+                        return true;
                       });
     $urlMatcherFactoryProvider.strictMode(false);
 
@@ -188,7 +196,9 @@ openprojectModule
         controller: 'WorkPackageCopyController',
         controllerAs: '$ctrl',
         templateUrl: '/components/routing/wp-list/wp.list.new.html',
-        reloadOnSearch: false
+        reloadOnSearch: false,
+        onEnter: () => angular.element('body').addClass('action-details'),
+        onExit: () => angular.element('body').removeClass('action-details')
       })
       .state('work-packages.list.details', {
         url: '/details/{workPackageId:[0-9]+}',

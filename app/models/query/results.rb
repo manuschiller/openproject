@@ -42,7 +42,8 @@ class ::Query::Results
 
   # Returns the work package count
   def work_package_count
-    WorkPackage.includes(:status, :project)
+    WorkPackage.visible
+               .includes(:status, :project)
                .where(query.statement)
                .references(:statuses, :projects)
                .count
@@ -57,7 +58,9 @@ class ::Query::Results
       if query.grouped?
         begin
           # Rails will raise an (unexpected) RecordNotFound if there's only a nil group value
-          r = WorkPackage.group(query.group_by_statement)
+          r = WorkPackage
+              .group(query.group_by_statement)
+              .visible
               .includes(:status, :project)
               .where(query.statement)
               .references(:statuses, :projects)
@@ -85,6 +88,7 @@ class ::Query::Results
       includes_for_columns(query.involved_columns) + (options[:include] || [])).uniq
 
     WorkPackage
+      .visible
       .where(::Query.merge_conditions(query.statement, options[:conditions]))
       .includes(includes)
       .joins((query.group_by_column ? query.group_by_column.join : nil))
@@ -101,9 +105,9 @@ class ::Query::Results
   end
 
   def versions
-    Version.includes(:project)
+    Version
+      .visible
       .where(::Query.merge_conditions(query.project_statement, options[:conditions]))
-      .references(:projects)
   rescue ::ActiveRecord::StatementInvalid => e
     raise ::Query::StatementInvalid.new(e.message)
   end
@@ -113,7 +117,9 @@ class ::Query::Results
   end
 
   def all_total_sums
-    query.available_columns.inject({}) { |result, column|
+    query.available_columns.select { |column|
+      column.summable? && Setting.work_package_list_summable_columns.include?(column.name.to_s)
+    }.inject({}) { |result, column|
       sum = total_sum_of(column)
       result[column] = sum unless sum.nil?
       result

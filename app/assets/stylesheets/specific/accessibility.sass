@@ -51,10 +51,6 @@ body.accessibility-mode
 
   // Mark currently selected top menu items
   #top-menu
-    li a,
-    li.drop-down a
-      border: 1px solid transparent
-
     li a.selected,
     li.drop-down.selected a
       background: $main-menu-bg-hover-selected-background !important
@@ -85,3 +81,10 @@ body.accessibility-mode
   .skip-navigation-link:focus
     top: auto
     left: auto
+
+  // Show inplace-editing icons so that they can be accessed directly
+  .inplace-editing--trigger-link
+    .inplace-editing--container
+      border-color: $inplace-edit--border-color
+    .inplace-edit--icon-wrapper
+      visibility: visible

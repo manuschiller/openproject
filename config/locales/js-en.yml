@@ -32,6 +32,8 @@ en:
       hide: "Hide"
       loading: "Loading ..."
     close_popup_title: "Close popup"
+    close_filter_title: "Close filter"
+    close_form_title: "Close form"
 
     clipboard:
       browser_error: "Your browser doesn't support copying to clipboard. Please copy the selected text manually."
@@ -40,6 +42,7 @@ en:
     button_add_watcher: "Add watcher"
     button_cancel: "Cancel"
     button_check_all: "Check all"
+    button_confirm: "Confirm"
     button_copy: "Copy"
     button_delete: "Delete"
     button_delete_watcher: "Delete watcher"
@@ -62,6 +65,7 @@ en:
     button_export-pdf: "Download PDF"
     button_export-atom: "Download Atom"
     description_available_columns: "Available Columns"
+    description_current_position: "You are here:"
     description_select_work_package: "Select work package #%{id}"
     description_selected_columns: "Selected Columns"
     description_subwork_package: "Child of work package #%{id}"
@@ -150,6 +154,7 @@ en:
     label_on: "on"
     label_open_menu: "Open menu"
     label_open_work_packages: "open"
+    label_password: "Password"
     label_previous: "Previous"
     label_per_page: "Per page:"
     label_please_wait: "Please wait"
@@ -189,6 +194,7 @@ en:
     label_attachments: Files
     label_drop_files: Drop files here
     label_drop_files_hint: or click to add files
+    label_add_attachments: "Add attachments"
     label_remove_file: "Delete %{fileName}"
     label_remove_watcher: "Remove watcher %{name}"
     label_remove_all_files: Delete all files
@@ -200,6 +206,10 @@ en:
     label_wait: "Please wait for configuration..."
     label_upload_counter: "%{done} of %{count} files finished"
     label_validation_error: "The work package could not be saved due to the following errors:"
+
+    password_confirmation:
+      field_description: 'You need to enter your account password to confirm this change.'
+      title: 'Confirm your password to continue'
 
     pagination:
       no_other_page: "You are on the only page."
@@ -352,8 +362,11 @@ en:
       outlines: "Hierarchy level"
     unsupported_browser:
       title: "Your browser version is not supported"
-      message: "The browser version you are using is no longer supported by OpenProject. Please update your browser."
+      message: "The browser version you are using is no longer supported by OpenProject."
+      update_message: 'Please update your browser.'
+      update_ie_user: "Please switch to Mozilla Firefox or Google Chrome, or upgrade to Microsoft Edge."
       learn_more: "Learn more"
+      close_warning: "Ignore this warning."
     wiki_formatting:
       strong: "Strong"
       italic: "Italic"
@@ -451,6 +464,7 @@ en:
         display_sums: "Display Sums"
         errors:
           unretrievable_query: "Unable to retrieve query from URL"
+          not_found: "There is no such query"
       table:
         summary: "Table with rows of work package and columns of work package attributes."
         text_inline_edit: "Most cells of this table are buttons that activate inline-editing functionality of that attribute."

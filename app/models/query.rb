@@ -364,9 +364,9 @@ class Query < ActiveRecord::Base
 
   def project_statement
     project_clauses = []
+    subproject_filter = filter_for 'subproject_id'
     if project && !project.descendants.active.empty?
       ids = [project.id]
-      subproject_filter = filter_for 'subproject_id'
       if subproject_filter
         case subproject_filter.operator
         when '='
@@ -376,16 +376,15 @@ class Query < ActiveRecord::Base
           # main project only
         else
           # all subprojects
-          ids += project.descendants.map(&:id)
+          ids += project.descendants.pluck(:id)
         end
       elsif Setting.display_subprojects_work_packages?
-        ids += project.descendants.map(&:id)
+        ids += project.descendants.pluck(:id)
       end
       project_clauses << "#{Project.table_name}.id IN (%s)" % ids.join(',')
     elsif project
       project_clauses << "#{Project.table_name}.id = %d" % project.id
     end
-    project_clauses << WorkPackage.visible_condition(User.current)
     project_clauses.join(' AND ')
   end
 
@@ -432,9 +431,15 @@ class Query < ActiveRecord::Base
             sql_parts << "#{WorkPackage.table_name}.id #{operator == '=' ? 'IN' : 'NOT IN'} (SELECT #{db_table}.watchable_id FROM #{db_table} WHERE #{db_table}.watchable_type='WorkPackage' AND #{sql_for_field field, '=', [user_id], db_table, db_field})"
           end
           # filter watchers only in projects the user has the permission to view watchers in
-          project_ids = User.current.projects_by_role.map { |r, p| p if r.permissions.include? :view_work_package_watchers }.flatten.compact.map(&:id).uniq
-          sql_parts << "#{WorkPackage.table_name}.id #{operator == '=' ? 'IN' : 'NOT IN'} (SELECT #{db_table}.watchable_id FROM #{db_table} WHERE #{db_table}.watchable_type='WorkPackage' AND #{sql_for_field field, '=', values, db_table, db_field})"\
-                       " AND #{Project.table_name}.id IN (#{project_ids.join(',')})" unless project_ids.empty?
+          sql_parts << <<-SQL
+            #{WorkPackage.table_name}.id #{operator == '=' ? 'IN' : 'NOT IN'}
+              (SELECT #{db_table}.watchable_id
+               FROM #{db_table}
+               WHERE #{db_table}.watchable_type='WorkPackage'
+                 AND #{sql_for_field field, '=', values, db_table, db_field})
+                 AND #{Project.table_name}.id IN
+                   (#{Project.allowed_to(User.current, :view_work_package_watchers).to_sql})
+          SQL
           sql << "(#{sql_parts.join(' OR ')})"
         end
       elsif field == 'member_of_group' # named field
@@ -489,7 +494,7 @@ class Query < ActiveRecord::Base
       filters_clauses << sql
     end if filters.present? and valid?
 
-    (filters_clauses << project_statement).join(' AND ')
+    (filters_clauses << project_statement).reject(&:empty?).join(' AND ')
   end
 
   # Returns the result set
@@ -501,20 +506,19 @@ class Query < ActiveRecord::Base
   # Returns the journals
   # Valid options are :order, :offset, :limit
   def work_package_journals(options = {})
-    query = Journal.includes(:user)
-            .where(journable_type: WorkPackage.to_s)
-            .joins('INNER JOIN work_packages ON work_packages.id = journals.journable_id')
-            .joins('INNER JOIN projects ON work_packages.project_id = projects.id')
-            .joins('INNER JOIN users AS authors ON work_packages.author_id = authors.id')
-            .joins('INNER JOIN types ON work_packages.type_id = types.id')
-            .joins('INNER JOIN statuses ON work_packages.status_id = statuses.id')
-            .where(statement)
-            .order(options[:order])
-            .limit(options[:limit])
-            .offset(options[:offset])
-            .references(:users)
+    Journal.includes(:user)
+           .where(journable_type: WorkPackage.to_s)
+           .joins('INNER JOIN work_packages ON work_packages.id = journals.journable_id')
+           .joins('INNER JOIN projects ON work_packages.project_id = projects.id')
+           .joins('INNER JOIN users AS authors ON work_packages.author_id = authors.id')
+           .joins('INNER JOIN types ON work_packages.type_id = types.id')
+           .joins('INNER JOIN statuses ON work_packages.status_id = statuses.id')
+           .order(options[:order])
+           .limit(options[:limit])
+           .offset(options[:offset])
+           .references(:users)
+           .merge(WorkPackage.visible)
 
-    query
   rescue ::ActiveRecord::StatementInvalid => e
     raise ::Query::StatementInvalid.new(e.message)
   end

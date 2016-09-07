@@ -167,7 +167,7 @@ class Project < ActiveRecord::Base
   }
   scope :active, -> { where(status: STATUS_ACTIVE) }
   scope :public_projects, -> { where(is_public: true) }
-  scope :visible, ->(user = User.current) { where(Project.visible_by(user)) }
+  scope :visible, ->(user = User.current) { Project.visible_by(user) }
   scope :newest, -> { order(created_on: :desc) }
 
   # timelines stuff
@@ -313,80 +313,20 @@ class Project < ActiveRecord::Base
     save
   end
 
-  # Returns a SQL :conditions string used to find all active projects for the specified user.
+  # Returns all projects the user is allowed to see.
   #
-  # Examples:
-  #     Projects.visible_by(admin)        => "projects.status = 1"
-  #     Projects.visible_by(normal_user)  => "projects.status = 1 AND projects.is_public = 1"
-  def self.visible_by(user = nil)
-    user ||= User.current
-    if user && user.admin?
-      return "#{Project.table_name}.status=#{Project::STATUS_ACTIVE}"
-    elsif user && user.memberships.any?
-      return "#{Project.table_name}.status=#{Project::STATUS_ACTIVE} AND (#{Project.table_name}.is_public = #{connection.quoted_true} or #{Project.table_name}.id IN (#{user.memberships.map(&:project_id).join(',')}))"
-    else
-      return "#{Project.table_name}.status=#{Project::STATUS_ACTIVE} AND #{Project.table_name}.is_public = #{connection.quoted_true}"
-    end
+  # Employs the :view_project permission to perform the
+  # authorization check as the permissino is public, meaning it is granted
+  # to everybody having at least one role in a project regardless of the
+  # role's permissions.
+  def self.visible_by(user = User.current)
+    allowed_to(user, :view_project)
   end
 
-  # Returns a ActiveRecord::Relation to find all projects for which +user+ has the given +permission+
-  #
-  # Valid options:
-  # * project: limit the condition to project
-  # * with_subprojects: limit the condition to project and its subprojects
-  # * member: limit the condition to the user projects
-  def self.allowed_to(user, permission, options = {})
-    where(allowed_to_condition(user, permission, options))
-      .references(:projects)
-  end
-
-  # Returns a SQL conditions string used to find all projects for which +user+ has the given +permission+
-  #
-  # Valid options:
-  # * project: limit the condition to project
-  # * with_subprojects: limit the condition to project and its subprojects
-  # * member: limit the condition to the user projects
-  # * project_alias: the alias to use for the project's table - default: 'projects'
-  def self.allowed_to_condition(user, permission, options = {})
-    table_alias = options.fetch(:project_alias, Project.table_name)
-
-    base_statement = "#{table_alias}.status=#{Project::STATUS_ACTIVE}"
-    if perm = Redmine::AccessControl.permission(permission)
-      unless perm.project_module.nil?
-        # If the permission belongs to a project module, make sure the module is enabled
-        base_statement << " AND #{table_alias}.id IN (SELECT em.project_id FROM #{EnabledModule.table_name} em WHERE em.name='#{perm.project_module}')"
-      end
-    end
-    if options[:project]
-      project_statement = "#{table_alias}.id = #{options[:project].id}"
-      project_statement << " OR (#{table_alias}.lft > #{options[:project].lft} AND #{table_alias}.rgt < #{options[:project].rgt})" if options[:with_subprojects]
-      base_statement = "(#{project_statement}) AND (#{base_statement})"
-    end
-
-    if user.admin?
-      base_statement
-    else
-      statement_by_role = {}
-      if user.logged?
-        if Role.non_member.allowed_to?(permission) && !options[:member]
-          statement_by_role[Role.non_member] = "#{table_alias}.is_public = #{connection.quoted_true}"
-        end
-        user.projects_by_role.each do |role, projects|
-          if role.allowed_to?(permission)
-            statement_by_role[role] = "#{table_alias}.id IN (#{projects.map(&:id).join(',')})"
-          end
-        end
-      else
-        if Role.anonymous.allowed_to?(permission) && !options[:member]
-          statement_by_role[Role.anonymous] = "#{table_alias}.is_public = #{connection.quoted_true}"
-        end
-      end
-      if statement_by_role.empty?
-        '1=0'
-      else
-        "((#{base_statement}) AND (#{statement_by_role.values.join(' OR ')}))"
-      end
-    end
+  # Returns a ActiveRecord::Relation to find all projects for which
+  # +user+ has the given +permission+
+  def self.allowed_to(user, permission)
+    Authorization.projects(permission, user)
   end
 
   # Returns the Systemwide and project specific activities
@@ -444,12 +384,6 @@ class Project < ActiveRecord::Base
     cond = "#{Project.table_name}.id = #{id}"
     cond = "(#{cond} OR (#{Project.table_name}.lft > #{lft} AND #{Project.table_name}.rgt < #{rgt}))" if with_subprojects
     cond
-  end
-
-  def self.find_visible(user, *args)
-    where(Project.visible_by(user)).scoping do
-      find(*args)
-    end
   end
 
   def active?

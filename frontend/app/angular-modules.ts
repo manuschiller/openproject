@@ -26,18 +26,18 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-declare const I18n:op.I18n;
+declare const I18n: op.I18n;
 
 // global
-angular.module('openproject.uiComponents',
+export const opUiComponentsModule = angular.module('openproject.uiComponents',
   ['ui.select', 'ui.router', 'ngSanitize', 'openproject.workPackages.services'])
-  .run(['$rootScope', function($rootScope){
+  .run(['$rootScope', function ($rootScope) {
     $rootScope.I18n = I18n;
   }]);
 export const animationsModule = angular.module('openproject.animations', [
   'ngAnimate'
 ]);
-export const configModule = angular.module('openproject.config', []);
+export const opConfigModule = angular.module('openproject.config', []);
 export const opServicesModule = angular.module('openproject.services', [
   'openproject.uiComponents',
   'openproject.helpers',
@@ -48,11 +48,11 @@ export const opServicesModule = angular.module('openproject.services', [
   'openproject.filters'
 ]);
 angular.module('openproject.helpers', ['openproject.services']);
-angular
-  .module('openproject.models', [
-    'openproject.workPackages.config',
-    'openproject.services'
-  ]);
+
+export const opModelsModule = angular.module('openproject.models', [
+  'openproject.workPackages.config',
+  'openproject.services'
+]);
 export const opViewModelsModule = angular.module('openproject.viewModels', [
   'openproject.services'
 ]);
@@ -146,7 +146,7 @@ export const opApiModule = angular.module('openproject.api', [
   'openproject.services'
 ]);
 
-angular.module('openproject.templates', []);
+export const opTemplatesModule = angular.module('openproject.templates', []);
 
 // refactoring
 angular.module('openproject.inplace-edit', []);
@@ -160,6 +160,7 @@ export const wpButtonsModule = angular.module('openproject.wpButtons',
   ['ui.router', 'openproject.services']);
 
 // main app
+var angularDragula:any = require('angular-dragula');
 export const openprojectModule = angular.module('openproject', [
   'ui.router',
   'openproject.animations',
@@ -170,10 +171,9 @@ export const openprojectModule = angular.module('openproject', [
   'openproject.messages',
   'openproject.timeEntries',
   'ngAnimate',
-  'foundation',
-  'foundation.modal',
   'ngAria',
   'ngSanitize',
+  angularDragula(angular),
   'ngDialog',
   'truncate',
   'openproject.layout',

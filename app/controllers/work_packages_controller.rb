@@ -31,16 +31,6 @@ class WorkPackagesController < ApplicationController
   DEFAULT_SORT_ORDER = ['parent', 'desc']
   EXPORT_FORMATS = %w[atom rss xls csv pdf]
 
-  current_menu_item :index do |controller|
-    query = controller.instance_variable_get :"@query"
-
-    if query && query.persisted? && current = query.query_menu_item.try(:unique_name)
-      current
-    else
-      :work_packages
-    end
-  end
-
   include QueriesHelper
   include PaginationHelper
   include SortHelper
@@ -51,8 +41,10 @@ class WorkPackagesController < ApplicationController
   # before_filter :disable_api # TODO re-enable once API is used for any JSON request
   before_filter :authorize_on_work_package, only: :show
   before_filter :find_optional_project,
-                :protect_from_unauthorized_export,
-                :load_query, only: :index
+                :protect_from_unauthorized_export, only: :index
+
+  before_filter :load_query,
+                :load_work_packages, only: :index, unless: ->() { request.format.html? }
 
   def show
     respond_to do |format|
@@ -82,8 +74,6 @@ class WorkPackagesController < ApplicationController
   end
 
   def index
-    load_work_packages unless request.format.html?
-
     respond_to do |format|
       format.html do
         gon.settings = client_preferences
@@ -121,8 +111,32 @@ class WorkPackagesController < ApplicationController
     render_404
   end
 
-  current_menu_item :index do
-    :work_packages
+  # This takes care that the current position in the top menu is marked.
+  # Depending on the selected query an entry is highlighted in accessibility mode.
+  current_menu_item :index do |controller|
+    url_helper = OpenProject::StaticRouting::StaticUrlHelpers.new
+    url_helper.extend WorkPackagesFilterHelper
+
+    case controller.current_path
+    when url_helper.index_work_packages_path
+      :list_work_packages
+    when url_helper.new_work_packages_path
+      :new_work_packages
+    when url_helper.work_packages_assigned_to_me_path
+      :work_packages_filter_assigned_to_me
+    when url_helper.work_packages_reported_by_me_path
+      :work_packages_filter_reported_by_me
+    when url_helper.work_packages_responsible_for_path
+      :work_packages_filter_responsible_for
+    when url_helper.work_packages_watched_path
+      :work_packages_filter_watched_by_me
+    else
+      :work_packages
+    end
+  end
+
+  def current_path
+    request.fullpath
   end
 
   protected

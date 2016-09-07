@@ -1,4 +1,4 @@
-<div class="relation-row" wp-single-relation ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
+<div class="relation-row" ng-mouseover="$ctrl.showRelationControls = true" ng-mouseleave="$ctrl.showRelationControls = false">
     <div class="grid-block hierarchy-item">
 
         <div class="grid-content medium-3 collapse">
@@ -6,7 +6,7 @@
 
         </div>
 
-        <div class="grid-content medium-4 collapse">
+        <div class="grid-content medium-4 collapse" wp-single-relation ng-if="$ctrl.workPackage">
             <a href="{{$singleRelation.workPackagePath($ctrl.relatedWorkPackage.id)}}">
                 {{$singleRelation.getFullIdentifier($ctrl.relatedWorkPackage, true)}}
             </a>

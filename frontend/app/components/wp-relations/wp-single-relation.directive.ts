@@ -27,9 +27,11 @@
 //++
 
 import {wpTabsModule} from '../../angular-modules';
+import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {RelationResource} from './wp-relations.interfaces';
 /**
- * Contains methods and attributes shared across common relations 
- * and parent child relations
+ * Contains methods and attributes shared
+ * between common relations and parent-child relations
  */
 export class WorkPackageSingleRelationController {
   public workPackagePath = this.PathHelper.workPackagePath;
@@ -37,16 +39,15 @@ export class WorkPackageSingleRelationController {
   constructor(protected PathHelper) {
   }
 
-  public getFullIdentifier(workPackage, hideType?:boolean) {
-    var type = ' ';
+  public getFullIdentifier(workPackage:WorkPackageResourceInterface, hideType?:boolean) {
+    var type = '';
     if (workPackage.type && !hideType) {
       type += workPackage.type.name + ': ';
     }
-    //return `#${workPackage.id}${type}${workPackage.subject}`;
-    return workPackage.subject;
+    return `${type}${workPackage.subject}`;
   }
 
-  public canRemoveRelation(relation):boolean {
+  public canRemoveRelation(relation:RelationResource):boolean {
       return !!relation.remove;
   }
 

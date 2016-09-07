@@ -27,42 +27,44 @@
 //++
 
 import {wpTabsModule} from '../../../angular-modules';
-import {WorkPackageResourceInterface} from "../../api/api-v3/hal-resources/work-package-resource.service";
-import {RelatedWorkPackage} from "../wp-relations.interfaces";
-import {WorkPackageCacheService} from "../../work-packages/work-package-cache.service";
+import {WorkPackageResourceInterface} from '../../api/api-v3/hal-resources/work-package-resource.service';
+import {WorkPackageCacheService} from '../../work-packages/work-package-cache.service';
 
 export class WorkPackageRelationsHierarchyController {
-  public parent;
-  public children = [];
-  public workPackage:RelatedWorkPackage;
+  public parent:WorkPackageResourceInterface;
+  public children:Array<WorkPackageResourceInterface> = [];
+  public workPackage:WorkPackageResourceInterface;
   public showEditForm:boolean = false;
   public workPackagePath = this.PathHelper.workPackagePath;
 
-  constructor(protected $scope,
-              protected $rootScope,
+  constructor(protected $scope:ng.IScope,
+              protected $rootScope:ng.IRootScopeService,
               protected $q:ng.IQService,
               protected PathHelper,
-              protected wpCacheService) {
-    // TODO: refactor to using wpCacheService instead of $q
-
+              protected wpCacheService:WorkPackageCacheService) {
     this.registerEventListeners();
 
     if (angular.isNumber(this.workPackage.parentId)) {
-      this.wpCacheService.loadWorkPackage(this.workPackage.parentId)
-        .take(1)
-        .subscribe((parent:WorkPackageResourceInterface) => {
+      this.loadParents();
+    }
+
+    if (this.workPackage.children) {
+      this.loadChildren();
+    }
+  }
+
+  protected loadParents() {
+    this.wpCacheService.loadWorkPackage(this.workPackage.parentId)
+      .take(1)
+      .subscribe((parent:WorkPackageResourceInterface) => {
         this.parent = parent;
       });
-    }
-    // move to wpcacheservice
-    if (this.workPackage.children) {
-      let relatedChildrenPromises = [];
+  }
 
-      this.workPackage.children.forEach(child => relatedChildrenPromises.push(child.$load()));
-
-      $q.all(relatedChildrenPromises).then(children => this.children = children);
-    }
-
+  protected loadChildren() {
+    let relatedChildrenPromises = [];
+    this.workPackage.children.forEach(child => relatedChildrenPromises.push(child.$load()));
+    this.$q.all(relatedChildrenPromises).then(children => this.children = children);
   }
 
   protected removedChild(evt, workPackage) {
@@ -83,13 +85,15 @@ export class WorkPackageRelationsHierarchyController {
 
   private updateParent(evt, changedData) {
     if (changedData.parentId !== null) {
-      this.wpCacheService.loadWorkPackage([changedData.parentId])
+      // parent changed
+      this.wpCacheService.loadWorkPackage(changedData.parentId)
         .take(1)
         .subscribe((parent:WorkPackageResourceInterface) => {
           this.parent = parent;
           this.$rootScope.$emit('workPackagesRefreshInBackground');
         });
     } else {
+      // parent deleted
       this.$rootScope.$emit('workPackagesRefreshInBackground');
       this.parent = null;
     }

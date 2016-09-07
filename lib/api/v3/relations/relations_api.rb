@@ -81,8 +81,23 @@ module API
 
             patch do
               authorize(:manage_work_package_relations, context: @work_package.project)
-              Relation.update(params[:relation_id], :description => params[:description]) if params[:description].present?
-              Relation.update(params[:relation_id], :relation_type => params[:relation_type]) if params[:relation_type].present?
+              # TODO: Jens, Oliver, Markus => please change this to allow :description and :relation_type
+              # as optional parameters and combine them in one single update query...
+
+              if params[:description].present?
+                if Relation.update(params[:relation_id], :description => params[:description])
+                  status 204
+                else
+                  fail ::API::Errors::Validation.new(nil, 'could not update description')
+                end
+              end
+              if params[:relation_type].present?
+                if Relation.update(params[:relation_id], :relation_type => params[:relation_type])
+                  status 204
+                else
+                  fail ::API::Errors::Validation.new(nil, 'could not update relation type')
+                end
+              end
             end
           end
         end

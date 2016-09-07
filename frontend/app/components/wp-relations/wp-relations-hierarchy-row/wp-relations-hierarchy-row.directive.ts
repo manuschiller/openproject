@@ -14,21 +14,16 @@ class WpRelationsHierarchyRowDirectiveController {
   public workPackagePath = this.PathHelper.workPackagePath;
 
   constructor(protected $scope,
+              protected WpRelationsHierarchyService,
               protected wpCacheService,
               protected PathHelper,
               protected wpNotificationsService) {
+
+    // display base wp
     if (!this.relatedWorkPackage && this.relationType !== 'parent') {
       this.relatedWorkPackage = angular.copy(this.workPackage);
     }
   };
-
-  public getFullIdentifier(hideType?:boolean) {
-    var type = ' ';
-    if (this.relatedWorkPackage.type && !hideType) {
-      type += this.relatedWorkPackage.type.name + ': ';
-    }
-    return `${type}${this.relatedWorkPackage.subject}`;
-  }
 
   public removeRelation() {
     if (this.relationType === 'child') {
@@ -40,19 +35,24 @@ class WpRelationsHierarchyRowDirectiveController {
   }
 
   protected removeChild() {
-    this.relatedWorkPackage.parentId = null;
-    this.relatedWorkPackage.save().then(relatedExChildWp => {
-      this.$scope.$emit('wp-relations.removedChild', relatedExChildWp);
+    this.WpRelationsHierarchyService.removeChild(this.relatedWorkPackage).then(exChildWp => {
+      this.$scope.$emit('wp-relations.removedChild', exChildWp);
     });
   }
 
   protected removeParent() {
-    this.changeParent(null);
+    this.WpRelationsHierarchyService.removeParent(this.workPackage).then((updatedWp) => {
+      this.$scope.$emit('wp-relations.changedParent', {
+        updatedWp: this.workPackage,
+        parentId: null
+      });
+    });
   }
 
   protected changeParent(wpId) {
-    this.workPackage.parentId = wpId;
-    this.workPackage.save().then(wp => {
+    // TODO: use WpRelationsService.handleSuccess()
+    // TODO: error handling
+    this.WpRelationsHierarchyService.changeParent(this.workPackage, wpId).then((updatedWp) => {
       this.$scope.$emit('wp-relations.changedParent', {
         updatedWp: this.workPackage,
         parentId: wpId

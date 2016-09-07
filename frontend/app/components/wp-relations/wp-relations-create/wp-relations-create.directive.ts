@@ -15,21 +15,21 @@ export class WpRelationsCreateController {
 
   constructor(protected $scope,
               protected WpRelationsService,
+              protected WpRelationsHierarchyService,
               protected wpNotificationsService,
               protected wpCacheService,
               protected $state) {
 
     var defaultRelationType = angular.isDefined(this.fixedRelationType) ? this.fixedRelationType : 'relatedTo';
-    this.selectedRelationType = _.find(this.WpRelationsService.configuration.relationTypes, {name: defaultRelationType});
+    this.selectedRelationType = this.WpRelationsService.getRelationTypeObjectByName(defaultRelationType);
 
+    // TODO: Toggle not working properly..
     if (angular.isDefined(this.externalFormToggle)) {
       this.showRelationsCreateForm = this.externalFormToggle;
     }
   }
 
   public createRelation() {
-    // TODO: ADD ERROR HANDLING
-
     switch (this.selectedRelationType.name) {
       case 'parent':
         this.changeParent();
@@ -44,46 +44,25 @@ export class WpRelationsCreateController {
   }
 
   protected addExistingChildRelation() {
-    this.wpCacheService.loadWorkPackage([this.selectedWpId])
-      .take(1)
-      .subscribe(wpToBecomeChild => {
-        wpToBecomeChild.parentId = this.workPackage.id;
-        wpToBecomeChild.save()
-          .then(addedChildWp => {
-            this.$scope.$emit('wp-relations.addedChild', addedChildWp);
-          })
-          .finally(this.toggleRelationsCreateForm());
-      });
+    this.WpRelationsHierarchyService.addExistingChildWp(this.workPackage, this.selectedWpId)
+      .then(newChildWp => {
+        this.$scope.$emit('wp-relations.addedChild', newChildWp);
+      }
+    ).finally(this.toggleRelationsCreateForm());
   }
 
   protected createNewChildWorkPackage() {
-    this.workPackage.project.$load()
-      .then(() => {
-        const args = [
-          'work-packages.list.new',
-          {
-            parent_id: this.workPackage.id,
-            projectPath: this.workPackage.project.identifier
-          }
-        ];
-
-        if (this.$state.includes('work-packages.show')) {
-          args[0] = 'work-packages.new';
-        }
-
-        (<any>this.$state).go(...args);
-      });
+    this.WpRelationsHierarchyService.addNewChildWp(this.workPackage);
   }
 
-  // TODO: avoid copy paste
-  // move all create / update / remove actions to service
   protected changeParent() {
-    this.workPackage.parentId = (this.selectedWpId as number);
-      this.workPackage.save().then(updatedWp => {
-          this.$scope.$emit('wp-relations.changedParent', {
-            updatedWp: updatedWp,
-            parentId: this.selectedWpId
-          });
+    this.WpRelationsHierarchyService.changeParent(this.workPackage, this.selectedWpId)
+      .then(updatedWp => {
+        // TODO: use WpRelations.handleSuccess();
+        this.$scope.$emit('wp-relations.changedParent', {
+          updatedWp: updatedWp,
+          parentId: this.selectedWpId
+        });
       })
       .catch(err => console.log(err))
       .finally(() => {

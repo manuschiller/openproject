@@ -107,13 +107,18 @@ export class WorkPackageEditFormController {
    * without saving the resource.
    */
   public updateForm() {
+    console.log('update form');
     this.workPackage.updateForm(this.workPackage.$source).then(() => {
+      console.log('update form done');
       this.wpCacheService.updateWorkPackage(this.workPackage);
     });
   }
 
   public updateWorkPackage() {
-    
+    // TODO: BUGFIXING FOR WP-RELATIONS - changing the status in the wp-edit-form select box 
+    // does not set the dirty flag
+    // so the change does not get saved
+    // console.log('wp is dirty ?', this.workPackage.dirty)
     if (!(this.workPackage.dirty || this.workPackage.isNew)) {
       return this.$q.when(this.workPackage);
     }

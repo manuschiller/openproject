@@ -33,30 +33,15 @@ import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-pac
 
 export class WorkPackageRelationsService {
   constructor(protected $rootScope,
+              protected $q,
+              protected $state,
               protected I18n,
+              protected wpCacheService,
               protected wpNotificationsService) {
-  
-  }
-
-  public changeParent(workPackage, parentId) {
-    const params = {
-      parentId: parentId,
-      lockVersion: workPackage.lockVersion
-    };
-    return workPackage.changeParent(params);
-  }
-
-  public removeParent(workPackage) {
-    return this.changeParent(workPackage, null);
-  }
-
-  public addExistingChildWp(workPackage, relationType, relatedWorkPackage) {
 
   }
 
-  public addNewChildWp() {
-    
-  }
+
 
   public addCommonRelation(workPackage, relationType, relatedWpId) {
     const params = {
@@ -67,11 +52,22 @@ export class WorkPackageRelationsService {
     workPackage.addRelation(params);
   }
 
+  public changeRelationDescription(relation, description) {
+    const params = {
+      description: description
+    };
+    return relation.updateRelation(params);
+  }
+
+  public changeRelationType(relation, relationType) {
+    const params = {
+      relation_type: relationType
+    };
+    return relation.updateRelation(params);
+  }
+
   public removeCommonRelation(relation, workPackage) {
-    relation.remove().then(result => {
-      this.handleSuccess('wp-relations.relationRemoved', workPackage);
-    })
-      .catch(error => this.handleError(error, workPackage));
+    return relation.remove();
   }
 
   public handleSuccess(successMessage:string, dataToEmit, updatedWorkPackage?:WorkPackageResourceInterface) {
@@ -81,6 +77,39 @@ export class WorkPackageRelationsService {
 
   public handleError(error, workPackage?) {
 
+  }
+
+  public getTranslatedRelationTitle(relationTypeName:string) {
+    return this.configuration.relationTitles[relationTypeName];
+  }
+
+  public getRelationTypeObjectByType(type:string) {
+    return _.find(this.configuration.relationTypes, {type: type});
+  }
+
+  public getRelationTypeObjectByName(name:string) {
+    return _.find(this.configuration.relationTypes, {name: name});
+  }
+
+  public getRelationTitles(rejectParentChild?:boolean) {
+    let relationTitles = angular.copy(this.configuration.relationTitles);
+    if (rejectParentChild) {
+      _.remove(relationTitles, (relationTitleValue, relationTitleKey) => {
+        return relationTitleKey === 'parent' || relationTitleKey === 'children';
+      });
+    }
+    return relationTitles;
+  }
+
+  public getRelationTypes(rejectParentChild?:boolean) {
+
+    let relationTypes = angular.copy(this.configuration.relationTypes);
+    if (rejectParentChild) {
+      _.remove(relationTypes, (relationType) => {
+        return relationType.name === 'parent' || relationType.name === 'children';
+      });
+    }
+    return relationTypes;
   }
 
   public configuration = {

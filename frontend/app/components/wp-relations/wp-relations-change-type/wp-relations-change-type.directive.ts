@@ -27,39 +27,43 @@
 //++
 
 import {wpTabsModule} from '../../../angular-modules';
-import {RelatedWorkPackage} from '../wp-relations.interfaces';
+import {RelationResource} from '../wp-relations.interfaces';
 import {WorkPackageResourceInterface} from '../../api/api-v3/hal-resources/work-package-resource.service';
-import {HalResource} from "../../api/api-v3/hal-resources/hal-resource.service";
+import {WorkPackageRelationsService} from "../wp-relations.service";
 
 
 export class WorkPackageRelationsChangeTypeController {
-  public relation: HalResource;
-  public relationTypes = this.WpRelationsService.configuration.relationTypes;
+  public relation: RelationResource;
+  public relationTypes = angular.copy(this.WpRelationsService.getRelationTypes(true));
+  protected relationTitles = angular.copy(this.WpRelationsService.getRelationTitles(true));
+
+  // TODO: copy relationTypeInterface....
   public selectedRelationType;
   public editType:boolean;
-  protected relationTitles = this.WpRelationsService.configuration.relationTitles;
 
-  constructor(protected WpRelationsService) {
-    console.log('relation', this.relation);
-    this.selectedRelationType = _.find(this.WpRelationsService.configuration.relationTypes, {type: this.relation._type});
+
+  constructor(protected WpRelationsService:WorkPackageRelationsService) {
+    this.selectedRelationType = this.WpRelationsService.getRelationTypeObjectByType(this.relation._type);
   }
-  
+
   public changeRelationType() {
     let relation_type = this.selectedRelationType.name === 'relatedTo' ? this.selectedRelationType.id : this.selectedRelationType.name;
-    this.relation.updateRelation({
-      relation_type: relation_type
-    }).then(() => {
-      this.editType = false;
-    });
+
+    // TODO: success / error handling
+    this.WpRelationsService.changeRelationType(this.relation, relation_type)
+      .then(() => {
+        // successmessage
+      })
+      .catch(err => console.log(err))
+      .finally(() => { this.editType = false; });
   }
-  
+
   public getRelationTitle() {
-    return this.WpRelationsService.configuration.relationTitles[this.selectedRelationType.name];
+    return this.WpRelationsService.getTranslatedRelationTitle(this.selectedRelationType.name);
   }
 }
 
 function wpRelationsChangeType() {
-  // TODO: Possibly obsolete now
   return {
     restrict: 'E',
     replace: true,

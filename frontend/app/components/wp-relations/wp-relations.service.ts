@@ -37,7 +37,8 @@ export class WorkPackageRelationsService {
               protected $state,
               protected I18n,
               protected wpCacheService,
-              protected wpNotificationsService) {
+              protected wpNotificationsService,
+              protected NotificationsService) {
 
   }
 
@@ -70,9 +71,18 @@ export class WorkPackageRelationsService {
     return relation.remove();
   }
 
-  public handleSuccess(successMessage:string, dataToEmit, updatedWorkPackage?:WorkPackageResourceInterface) {
-    this.$rootScope.$emit(successMessage, dataToEmit);
-    this.wpNotificationsService.showSave(updatedWorkPackage);
+  public handleSuccess(successMessage:string, messageToEmit:string, dataToEmit?, updatedWorkPackage?:WorkPackageResourceInterface) {
+    if (dataToEmit) {
+      this.$rootScope.$emit(messageToEmit, dataToEmit);
+    }
+
+    if (updatedWorkPackage) {
+      this.wpNotificationsService.showSave(updatedWorkPackage);
+    }
+
+    if (successMessage) {
+      this.NotificationsService.addSuccess(successMessage);
+    }
   }
 
   public handleError(error, workPackage?) {

@@ -30,8 +30,6 @@ class WpRelationRowDirectiveController {
       var relationType = this.WpRelationsService.getRelationTypeObjectByType(this.relation._type);
       this.relationType = angular.isDefined(relationType) ? this.WpRelationsService.getTranslatedRelationTitle[relationType.name] : 'unknown';
     }
-
-    console.log('row', this.relation);
   };
 
   public toggleUserDescriptionForm() {
@@ -39,8 +37,6 @@ class WpRelationRowDirectiveController {
   }
 
   public updateRelationDescription() {
-    console.log('relatedWp', this.relatedWorkPackage);
-    console.log('relation', this.relation);
     this.WpRelationsService.changeRelationDescription(this.relation, this.userInputs.description)
       .then(() => {
         this.relation.description = this.userInputs.description;

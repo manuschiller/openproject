@@ -92,7 +92,6 @@ export class WorkPackageRelationsController {
         return wp.type.name;
       }) as Array);
     }
-    console.log(this.relationGroups);
   }
 
   protected addSingleRelation(evt, relation) {
@@ -109,7 +108,7 @@ export class WorkPackageRelationsController {
     var relations = [];
 
     this.workPackage.relations.elements.forEach(relation => {
-      const relatedWpId = this.getRelatedWorkPackageId(relation)
+      const relatedWpId = this.getRelatedWorkPackageId(relation);
       relatedWpIds.push(relatedWpId);
       relations[relatedWpId] = relation;
     });

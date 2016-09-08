@@ -43,7 +43,6 @@ function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
     link: function (scope, element, attrs, controllers ) {
       scope.relatedWps = [];
       getRelatedWorkPackages();
-      console.log('relation Type: ', scope.selectedRelationType);
 
       scope.onSelect = function(wpId){
         scope.selectedWpId = wpId;

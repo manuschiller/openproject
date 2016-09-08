@@ -35,10 +35,6 @@ export class WorkPackageRelationsGroupController {
   public relatedWorkPackages:Array<RelatedWorkPackage>;
   public workPackage:WorkPackageResourceInterface;
   public wpType:string;
-
-  constructor() {
-    console.log('group', this.relatedWorkPackages);
-  }
 }
 
 function wpRelationsGroupDirective() {

@@ -1,19 +1,9 @@
-<div style="margin-top:35px;">
+<div class="wp-relations-hierarchy-section">
     <div class="attributes-group--header">
         <div class="attributes-group--header-container">
             <h3 class="attributes-group--header-text">
                 Hierarchy
             </h3>
-        </div>
-    </div>
-
-    <div class="grid-block hierarchy-item relation-row" ng-hide="true">
-        <div class="grid-content medium-6 collapse">
-            <div class="attribute-header">subject</div>
-        </div>
-
-        <div class="grid-content medium-5 collapse">
-            <div class="attribute-header">status</div>
         </div>
     </div>
 
@@ -24,5 +14,6 @@
     <wp-relations-create
             fixed-relation-type="children"
             work-package="$ctrl.workPackage"
-            template="add-child"></wp-relations-create>
+            template="add-child"
+            ng-if="$ctrl.workPackage.addRelation && $ctrl.canHaveChildren"></wp-relations-create>
 </div>

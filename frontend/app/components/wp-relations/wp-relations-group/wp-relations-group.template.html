@@ -1,4 +1,4 @@
-<div style="margin-top:1.5em;">
+<div class="wp-relations-group">
     <div class="attributes-group--header">
         <div class="attributes-group--header-container">
             <h3 class="attributes-group--header-text">
@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <div class="content">
+    <div class="content" ng-if="$ctrl.relatedWorkPackages">
         <wp-relation-row
                 related-work-package="relatedWorkPackage"
                 ng-repeat="relatedWorkPackage in $ctrl.relatedWorkPackages"></wp-relation-row>

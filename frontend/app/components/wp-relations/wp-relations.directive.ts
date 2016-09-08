@@ -92,6 +92,7 @@ export class WorkPackageRelationsController {
         return wp.type.name;
       }) as Array);
     }
+    console.log(this.relationGroups);
   }
 
   protected addSingleRelation(evt, relation) {

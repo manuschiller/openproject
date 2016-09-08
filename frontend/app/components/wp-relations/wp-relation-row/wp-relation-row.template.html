@@ -2,7 +2,7 @@
     <div class="grid-block hierarchy-item">
 
         <div class="grid-content medium-3 collapse">
-            <wp-relations-change-type relation="$ctrl.relatedWorkPackage.relatedBy"></wp-relations-change-type>
+            <wp-relations-change-type relation="$ctrl.relation"></wp-relations-change-type>
 
         </div>
 
@@ -16,7 +16,7 @@
             <div wp-edit-field="'status'"></div>
         </div>
 
-        <div class="grid-content medium-2 collapse" style="text-align:right;">
+        <div class="grid-content medium-2 collapse wp-relations-controls-section">
             <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
                     execute="$ctrl.showRelationInfo = !$ctrl.showRelationInfo">
                 <icon-wrapper icon-name="info1"
@@ -25,7 +25,7 @@
             </accessible-by-keyboard>
 
             <accessible-by-keyboard ng-show="$ctrl.showRelationControls"
-                                    ng-if="$singleRelation.canRemoveRelation($ctrl.relatedWorkPackage.relatedBy)"
+                                    ng-if="$ctrl.relation.remove"
                     execute="$ctrl.removeRelation($ctrl.relation)">
                 <icon-wrapper icon-name="remove"
                               icon-title="'remove relation'">
@@ -33,12 +33,12 @@
             </accessible-by-keyboard>
         </div>
     </div>
-    <div class="grid-block hierarchy-item" style="border: 1px dotted lightblue; padding:4px;" ng-show="$ctrl.showRelationInfo">
+    <div class="grid-block description-section" ng-show="$ctrl.showRelationInfo">
         <div class="grid-content medium-10 collapse">
             <div ng-if="!$ctrl.userInputs.showDescriptionEditForm">
                 <icon-wrapper icon-name="info1" icon-title="'description empty'"></icon-wrapper>
-                {{$ctrl.relatedWorkPackage.relatedBy.description}}
-                <span ng-if="!$ctrl.relatedWorkPackage.relatedBy.description">
+                {{$ctrl.relation.description}}
+                <span ng-if="!$ctrl.relation.description">
                     no description set
                 </span>
             </div>
@@ -46,14 +46,14 @@
                 <input placeholder="Enter description for relation to #{{$ctrl.relatedWorkPackage.id}}..." type="text" ng-model="$ctrl.userInputs.description" />
             </div>
         </div>
-        <div class="grid-content medium-2 collapse" style="text-align: right" ng-if="!$ctrl.userInputs.showDescriptionEditForm">
-            <accessible-by-keyboard execute="$ctrl.toggleUserDescriptionForm()" style="position:absolute;right:0;">
+        <div class="grid-content medium-2 collapse wp-relations-controls-section" ng-if="!$ctrl.userInputs.showDescriptionEditForm">
+            <accessible-by-keyboard execute="$ctrl.toggleUserDescriptionForm()" class="force-right">
                 <icon-wrapper icon-name="edit"
                               icon-title="'edit description'">
                 </icon-wrapper>
             </accessible-by-keyboard>
         </div>
-        <div class="grid-content medium-2 collapse" style="text-align: right" ng-if="$ctrl.userInputs.showDescriptionEditForm">
+        <div class="grid-content medium-2 collapse wp-relations-controls-section" ng-if="$ctrl.userInputs.showDescriptionEditForm">
             <accessible-by-keyboard execute="$ctrl.toggleUserDescriptionForm()">
                 <icon-wrapper icon-name="remove"
                               icon-title="'abort'">

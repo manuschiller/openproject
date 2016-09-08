@@ -1,5 +1,5 @@
 <div>
-    <div class="wp-inline-create-button" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
+    <div class="wp-inline-create-button wp-relations-create-button -full-width" ng-if="!$relationsCreateCtrl.showRelationsCreateForm" style="width:100%;padding-right:25px;">
         <div class="grid-block">
             <div class="grid-content collapse">
                 <a class="wp-inline-create--add-link relation-create" ng-click="$relationsCreateCtrl.toggleRelationsCreateForm()">
@@ -16,7 +16,7 @@
                     selected-wp-id="$relationsCreateCtrl.selectedWpId"
                     selected-relation-type="$relationsCreateCtrl.selectedRelationType"></wp-relations-autocomplete>
         </div>
-        <div class="grid-content medium-2 collapse" style="text-align: right;">
+        <div class="grid-content medium-2 collapse wp-relations-controls-section relation-row">
             <accessible-by-keyboard
                     execute="$relationsCreateCtrl.createRelation()">
                 <icon-wrapper icon-name="checkmark"

@@ -46,14 +46,6 @@ export class WorkPackageSingleRelationController {
     }
     return `${type}${workPackage.subject}`;
   }
-
-  public canRemoveRelation(relation:RelationResource):boolean {
-      return !!relation.remove;
-  }
-
-  public canAddRelation(workPackage) {
-    return !!workPackage.addRelation;
-  }
 }
 
 function wpSingleRelationDirective() {

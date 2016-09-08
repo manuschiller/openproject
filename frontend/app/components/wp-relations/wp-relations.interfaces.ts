@@ -11,6 +11,7 @@ export interface RelatedWorkPackagesGroup {
 
 export interface RelationResource extends HalResource {
   _type: string;
+  description: string;
   updateRelation(params:Object): ng.IPromise;
   remove(): ng.IPromise;
 }

@@ -53,6 +53,8 @@ export class WorkPackageRelationsHierarchyController {
     }
   }
 
+  public canHaveChildren = !this.workPackage.isMilestone;
+
   protected loadParents() {
     this.wpCacheService.loadWorkPackage(this.workPackage.parentId)
       .take(1)
@@ -86,10 +88,12 @@ export class WorkPackageRelationsHierarchyController {
   private updateParent(evt, changedData) {
     if (changedData.parentId !== null) {
       // parent changed
-      this.wpCacheService.loadWorkPackage(changedData.parentId)
+      this.wpCacheService.loadWorkPackage(changedData.parentId, true)
         .take(1)
         .subscribe((parent:WorkPackageResourceInterface) => {
           this.parent = parent;
+
+          this.wpCacheService.updateWorkPackageList([this.workPackage, parent]);
           this.$rootScope.$emit('workPackagesRefreshInBackground');
         });
     } else {

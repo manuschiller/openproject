@@ -7,14 +7,14 @@
                 </a>
             </span>
         </div>
-        <div class="grid-content medium-4 collapse" style="margin-left:2px;">
+        <div class="grid-content medium-4 collapse wp-relations-status-field">
             <div wp-edit-form="$ctrl.relatedWorkPackage" ng-if="$ctrl.relatedWorkPackage">
                 <div wp-edit-field="'status'"
                         wp-edit-field-wrapper-classes="'-small -shrink -no-label'">
                 </div>
             </div>
         </div>
-        <div class="grid-content medium-2 collapse" style="text-align: right;">
+        <div class="grid-content medium-2 collapse wp-relations-controls-section">
             <div ng-hide="!$ctrl.showRelationControls">
                 <accessible-by-keyboard ng-hide="$ctrl.relationType !== 'parent'"
                                         execute="$ctrl.showEditForm = true">

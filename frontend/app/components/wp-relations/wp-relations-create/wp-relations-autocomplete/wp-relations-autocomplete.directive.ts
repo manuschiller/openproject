@@ -43,6 +43,7 @@ function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
     link: function (scope, element, attrs, controllers ) {
       scope.relatedWps = [];
       getRelatedWorkPackages();
+      console.log('relation Type: ', scope.selectedRelationType);
 
       scope.onSelect = function(wpId){
         scope.selectedWpId = wpId;
@@ -54,6 +55,8 @@ function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
         }
 
         findRelatableWorkPackages(term).then(workPackages => {
+          // reject already related work packages, self, children and parent
+          // to prevent invalid relations
           scope.options = _.reject(workPackages, (wp) => {
             return scope.relatedWps.indexOf(parseInt(wp.id)) > -1;
           });
@@ -77,7 +80,12 @@ function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
             method: 'GET',
             url: URI(PathHelper.workPackageJsonAutoCompletePath()).search(params).toString()
           })
-            .then((response:any) => deferred.resolve(response.data))
+            .then((response:any) => {
+              // TODO: THE JSON AUTOCOMPLETE MUST BE EXTENDED TO CONTAIN A REFERENCE TO THE
+              // ACTUAL WP-TYPE SINCE MILESTONES MAY NOT BE A PARENT ELEMENT AND THEREFORE THEY
+              // MUST BE REJECTED
+              deferred.resolve(response.data);
+            })
             .catch(deferred.reject);
         })
           .catch(deferred.reject);
@@ -85,16 +93,15 @@ function wpRelationsAutocompleteDirective($q, PathHelper, $http) {
         return deferred.promise;
       }
 
-      function getRelatedWorkPackages() {
-        /** NOTE: THIS METHOD COULD BE DONE MUCH MORE EFFICIENTLY BY THE BACKEND **/
+    function getRelatedWorkPackages() {
+        /** NOTE: THIS METHOD COULD PROBABLY DONE MORE EFFICIENTLY BY THE BACKEND **/
         const wpRelationsController:WorkPackageRelationsController = controllers[0];
         const wpRelationsHierarchyController:WorkPackageRelationsHierarchyController = controllers[1];
 
-        let wps = [];
+        let wps = [scope.workPackage.id];
 
-        if (wpRelationsController) {
-          wps = wps.concat(wpRelationsController.currentRelations.map(relation => relation.id));
-        }
+        wps = wps.concat(wpRelationsController.currentRelations.map(relation => relation.id));
+
         if (scope.workPackage.parentId) {
           wps.push(scope.workPackage.parentId);
         }

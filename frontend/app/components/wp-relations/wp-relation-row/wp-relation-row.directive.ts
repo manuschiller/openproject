@@ -3,10 +3,11 @@ import {
   WorkPackageResource,
   WorkPackageResourceInterface
 } from '../../api/api-v3/hal-resources/work-package-resource.service';
+import {RelatedWorkPackage, RelationResource} from "../wp-relations.interfaces";
 
 
 class WpRelationRowDirectiveController {
-  public relatedWorkPackage;
+  public relatedWorkPackage:RelatedWorkPackage;
   public relationType:string;
 
   public showRelationControls:boolean;
@@ -17,16 +18,20 @@ class WpRelationRowDirectiveController {
     showDescriptionEditForm: false
   };
 
+  public relation:RelationResource = this.relatedWorkPackage.relatedBy;
+
   constructor(protected $scope:ng.IScope,
               protected $element,
               protected wpCacheService,
               protected PathHelper,
               protected wpNotificationsService,
               protected WpRelationsService) {
-    if (this.relatedWorkPackage.relatedBy) {
-      var relationType = this.WpRelationsService.getRelationTypeObjectByType(this.relatedWorkPackage.relatedBy._type);
+    if (this.relation) {
+      var relationType = this.WpRelationsService.getRelationTypeObjectByType(this.relation._type);
       this.relationType = angular.isDefined(relationType) ? this.WpRelationsService.getTranslatedRelationTitle[relationType.name] : 'unknown';
     }
+
+    console.log('row', this.relation);
   };
 
   public toggleUserDescriptionForm() {
@@ -34,16 +39,18 @@ class WpRelationRowDirectiveController {
   }
 
   public updateRelationDescription() {
-    this.WpRelationsService.changeRelationDescription(this.relatedWorkPackage.relatedBy, this.userInputs.description)
+    console.log('relatedWp', this.relatedWorkPackage);
+    console.log('relation', this.relation);
+    this.WpRelationsService.changeRelationDescription(this.relation, this.userInputs.description)
       .then(() => {
-        this.relatedWorkPackage.relatedBy.description = this.userInputs.description;
+        this.relation.description = this.userInputs.description;
       })
       .catch(err => console.log(err))
       .finally(this.toggleUserDescriptionForm());
   }
 
   public removeRelation() {
-    const relation = this.relatedWorkPackage.relatedBy;
+    const relation = this.relation;
     this.WpRelationsService.removeCommonRelation(relation).then(() => {
       this.$scope.$emit('wp-relations.removed', relation);
       // TODO: WpRelationsService.handleSuccess()

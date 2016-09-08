@@ -59,7 +59,6 @@ module API
               r.to = WorkPackage.visible.find_by(id: declared_params[:to_id].match(/\d+/).to_s)
               r.relation_type = declared_params[:relation_type]
               r.delay = declared_params[:delay_id]
-              r.description = declared_params[:description]
             end
 
             if relation.valid? && relation.save
@@ -81,22 +80,18 @@ module API
 
             patch do
               authorize(:manage_work_package_relations, context: @work_package.project)
-              # TODO: Jens, Oliver, Markus => please change this to allow :description and :relation_type
-              # as optional parameters and combine them in one single update query...
 
-              if params[:description].present?
-                if Relation.update(params[:relation_id], :description => params[:description])
+              relation = Relation.find_by_id(params[:relation_id])
+              if relation
+                relation.description = params[:description] if params[:description].present?
+                relation.relation_type = params[:relation_type] if params[:relation_type].present?
+                if relation.valid? && relation.save
                   status 204
                 else
-                  fail ::API::Errors::Validation.new(nil, 'could not update description')
+                  fail ::API::Errors::Validation.new(nil, 'could not update relation')
                 end
-              end
-              if params[:relation_type].present?
-                if Relation.update(params[:relation_id], :relation_type => params[:relation_type])
-                  status 204
-                else
-                  fail ::API::Errors::Validation.new(nil, 'could not update relation type')
-                end
+              else
+                fail ::API::Errors::NotFound, I18n.t('api_v3.errors.code_404')
               end
             end
           end
